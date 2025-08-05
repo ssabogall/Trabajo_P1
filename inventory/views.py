@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .models import Product
 
 def inventory(request):
-    return HttpResponse("<h1>inventario</h1>")
+    products = Product.objects.all() 
+    return render(request, 'inventory.html', {'products': products})
