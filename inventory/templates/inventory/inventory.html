@@ -5,68 +5,70 @@
     <h1 class="mb-4 text-center">Gestión de Inventario</h1>
 
     <div class="row">
-        <!-- Inventario de productos -->
+        <!-- Productos -->
         <div class="col-md-6">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
                     Productos terminados
                 </div>
                 <div class="card-body">
-                    <p>Espacio para visualizar y gestionar el inventario de productos como panes, pasteles, etc.</p>
-                    <!-- Aquí puedes agregar una tabla más adelante -->
                     <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Producto</th>
+                                <th>Precio</th>
                                 <th>Cantidad</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
+                        {% for producto in productos %}
+                        <tr>
+                            <td>{{ producto.name }}</td>
+                            <td>${{ producto.price }}</td>
+                            <td>{{ producto.quantity }}</td>
+                            <td><button class="btn btn-sm btn-warning">Editar</button></td>
+                        </tr>
+                            {% empty %}
                             <tr>
-                                <td>Pan artesanal</td>
-                                <td>50</td>
-                                <td><button class="btn btn-sm btn-warning">Editar</button></td>
+                                <td colspan="4" class="text-center">No hay productos registrados</td>
                             </tr>
-                            <tr>
-                                <td>Pastel de chocolate</td>
-                                <td>20</td>
-                                <td><button class="btn btn-sm btn-warning">Editar</button></td>
-                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Inventario de materias primas -->
+        <!-- Materias primas -->
         <div class="col-md-6">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-success text-white">
                     Materias primas
                 </div>
                 <div class="card-body">
-                    <p>Espacio para visualizar y gestionar materias primas como harina, azúcar, huevos, etc.</p>
-                    <!-- Aquí puedes agregar otra tabla más adelante -->
                     <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Materia prima</th>
-                                <th>Cantidad</th>
+                                <th>Unidades</th>
+                                <th>Fecha venc.</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {% for materia in materias_primas %}
                             <tr>
-                                <td>Harina</td>
-                                <td>100 kg</td>
+                                <td>{{ materia.name }}</td>
+                                <td>{{ materia.units }}</td>
+                                <td>{{ materia.exp_date }}</td>
                                 <td><button class="btn btn-sm btn-warning">Editar</button></td>
                             </tr>
+                            {% empty %}
                             <tr>
-                                <td>Azúcar</td>
-                                <td>50 kg</td>
-                                <td><button class="btn btn-sm btn-warning">Editar</button></td>
+                                <td colspan="4" class="text-center">No hay materias primas registradas</td>
                             </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
