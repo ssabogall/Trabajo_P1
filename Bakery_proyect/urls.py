@@ -24,10 +24,12 @@ from products import views as viewsProduct
 
 from django.conf import settings
 from django.conf.urls.static import static
+from products import views as viewsProduct
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('inventory/',viewsInventory.inventory),
+    path('', viewsProduct.product, name='home'),  # Página principal
+    path('inventory/', include('inventory.urls')),
     path('products/',viewsProduct.product),
 ]
 if settings.DEBUG:

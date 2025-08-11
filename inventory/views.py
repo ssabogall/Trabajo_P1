@@ -1,5 +1,80 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import RawMaterial, CountRawMaterial, Product
+import json
 
 def inventory(request):
-    return render(request, 'inventory/inventory.html')
+    """Vista principal del inventario"""
+    raw_materials_with_count = []
+    
+    # Obtener todas las materias primas y sus contadores
+    for raw_material in RawMaterial.objects.all():
+        counter, created = CountRawMaterial.objects.get_or_create(
+            raw_material=raw_material,
+            defaults={'total_quantity': 0, 'minimum_stock': 0}
+        )
+        raw_materials_with_count.append({
+            'raw_material': raw_material,
+            'counter': counter,
+            'products_using': raw_material.products.count()
+        })
+    
+    # Debug: Imprimir para verificar estructura
+    print("DEBUG - Datos enviados:", raw_materials_with_count)
+    
+    context = {
+        'raw_materials_with_count': raw_materials_with_count,
+        'total_products': Product.objects.count(),
+    }
+    
+    return render(request, 'inventory/inventory.html', context)
+
+@csrf_exempt
+def update_stock(request):
+    """Actualizar stock via AJAX"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            raw_material_id = data.get('raw_material_id')
+            action = data.get('action')
+            quantity = float(data.get('quantity', 1))
+            
+            raw_material = get_object_or_404(RawMaterial, id=raw_material_id)
+            counter, created = CountRawMaterial.objects.get_or_create(
+                raw_material=raw_material,
+                defaults={'total_quantity': 0, 'minimum_stock': 0}
+            )
+            
+            if action == 'add':
+                counter.total_quantity += quantity
+                counter.save()
+                success = True
+                message = f"Se agregaron {quantity} {raw_material.units}"
+            elif action == 'remove':
+                if counter.total_quantity >= quantity:
+                    counter.total_quantity -= quantity
+                    counter.save()
+                    success = True
+                    message = f"Se redujeron {quantity} {raw_material.units}"
+                else:
+                    success = False
+                    message = "Stock insuficiente"
+            else:
+                success = False
+                message = "Acción no válida"
+            
+            return JsonResponse({
+                'success': success,
+                'message': message,
+                'new_quantity': counter.total_quantity,
+                'is_low_stock': counter.total_quantity <= counter.minimum_stock
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Error: {str(e)}'
+            })
+    
+    return JsonResponse({'success': False, 'message': 'Método no permitido'})
