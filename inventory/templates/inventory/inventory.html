@@ -2,46 +2,10 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4 text-center">Gestión de Inventario</h1>
+    <h1 class="mb-4 text-center">Gestión de Materias Primas</h1>
 
     <div class="row">
-        <!-- Productos -->
-        <div class="col-md-6">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    Productos terminados
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Precio</th>
-                                <th>Cantidad</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for producto in productos %}
-                        <tr>
-                            <td>{{ producto.name }}</td>
-                            <td>${{ producto.price }}</td>
-                            <td>{{ producto.quantity }}</td>
-                            <td><button class="btn btn-sm btn-warning">Editar</button></td>
-                        </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center">No hay productos registrados</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Materias primas -->
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-success text-white">
                     Materias primas
@@ -57,12 +21,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for materia in materias_primas %}
+                            {% for mp in materias_primas %}
                             <tr>
-                                <td>{{ materia.name }}</td>
-                                <td>{{ materia.units }}</td>
-                                <td>{{ materia.exp_date }}</td>
-                                <td><button class="btn btn-sm btn-warning">Editar</button></td>
+                                <td>{{ mp.name }}</td>
+                                <td>{{ mp.units }}</td>
+                                <td>{{ mp.exp_date }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning">Editar</button>
+                                </td>
                             </tr>
                             {% empty %}
                             <tr>
