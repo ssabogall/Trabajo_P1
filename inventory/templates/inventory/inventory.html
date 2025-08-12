@@ -27,7 +27,7 @@
                                 <td>{{ mp.units }}</td>
                                 <td>{{ mp.exp_date }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-warning">Editar</button>
+                                    <a href="{% url 'editar_materia' mp.id %}" class="btn btn-sm btn-warning">Editar</a>
                                 </td>
                             </tr>
                             {% empty %}
