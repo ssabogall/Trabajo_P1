@@ -28,6 +28,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('inventory/',viewsInventory.inventory),
     path('products/',viewsProduct.product),
+    path('pos_view/',viewsProduct.pos_view),
+    path('save_order/', viewsProduct.save_order),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
