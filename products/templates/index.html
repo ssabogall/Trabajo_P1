@@ -26,6 +26,23 @@
             </div>
         </nav>
 
+        <!-- Buscador -->
+<section class="py-3">
+  <div class="container px-4 px-lg-5">
+    <form method="get" class="d-flex" role="search">
+      <input class="form-control me-2" type="search" name="q"
+             placeholder="Buscar productos..." value="{{ q }}">
+      <button class="btn btn-outline-dark" type="submit">Buscar</button>
+    </form>
+    {% if q %}
+      <small class="text-muted d-block mt-2">
+        Resultados para "<strong>{{ q }}</strong>": {{ results_count }}
+      </small>
+    {% endif %}
+  </div>
+</section>
+
+
 
     <!-- <form action="">
         <div class="mb-3">

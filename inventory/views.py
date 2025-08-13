@@ -1,6 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required, permission_required
 from .models import RawMaterial, CountRawMaterial, Product
 import json
 
@@ -26,6 +27,7 @@ def inventory(request):
     context = {
         'raw_materials_with_count': raw_materials_with_count,
         'total_products': Product.objects.count(),
+        'materias_primas': RawMaterial.objects.all(),  # Para compatibilidad con template básico
     }
     
     return render(request, 'inventory/inventory.html', context)
@@ -78,3 +80,18 @@ def update_stock(request):
             })
     
     return JsonResponse({'success': False, 'message': 'Método no permitido'})
+
+@login_required
+@permission_required('inventory.change_rawmaterial', raise_exception=True)
+def editar_materia_prima(request, pk):
+    """Editar materia prima (desde main branch)"""
+    materia = get_object_or_404(RawMaterial, pk=pk)
+
+    if request.method == 'POST':
+        materia.name = request.POST.get('name')
+        materia.units = request.POST.get('units')
+        materia.exp_date = request.POST.get('exp_date')
+        materia.save()
+        return redirect('inventory:inventory')
+
+    return render(request, 'inventory/editar_materia.html', {'materia': materia})

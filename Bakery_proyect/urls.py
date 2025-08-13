@@ -15,22 +15,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from django.urls import include
+from django.urls import path, include
 
 from inventory import views as viewsInventory
 from products import views as viewsProduct
 
-
 from django.conf import settings
 from django.conf.urls.static import static
-from products import views as viewsProduct
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', viewsProduct.product, name='home'),  # Página principal
     path('inventory/', include('inventory.urls')),
-    path('products/',viewsProduct.product),
+    path('products/', viewsProduct.show_available_products),
+    path('pos_view/', viewsProduct.pos_view),
+    path('save_order/', viewsProduct.save_order),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
