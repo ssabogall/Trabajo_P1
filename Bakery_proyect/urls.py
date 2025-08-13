@@ -28,7 +28,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
 #     path('inventory/',viewsInventory.inventory),
-    path('products/',viewsProduct.product),
+    path('products/',viewsProduct.show_available_products),
     path('pos_view/',viewsProduct.pos_view),
     path('save_order/', viewsProduct.save_order),
     path('inventory/', include('inventory.urls')),
