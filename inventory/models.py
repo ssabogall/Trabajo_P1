@@ -16,11 +16,7 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=7, decimal_places=0)
-<<<<<<< HEAD
     quantity = models.PositiveIntegerField(default=0)
-=======
-    quantity = models.PositiveIntegerField(default=0,blank=True)
->>>>>>> visulisador-de-disponibilidad
     picture = models.ImageField(blank=True, null=True, upload_to='')
     raw_materials = models.ManyToManyField(
         'RawMaterial',
