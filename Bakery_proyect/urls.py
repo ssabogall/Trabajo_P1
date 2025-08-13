@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import path, include
 
 from inventory import views as viewsInventory
 from products import views as viewsProduct
@@ -26,8 +27,12 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('inventory/',viewsInventory.inventory),
+#     path('inventory/',viewsInventory.inventory),
     path('products/',viewsProduct.show_available_products),
+    path('pos_view/',viewsProduct.pos_view),
+    path('save_order/', viewsProduct.save_order),
+    path('inventory/', include('inventory.urls')),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
