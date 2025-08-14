@@ -17,7 +17,7 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=7, decimal_places=0)
     quantity = models.PositiveIntegerField(default=0)
-    picture = models.ImageField(blank=True, null=True, upload_to='')
+    picture = models.ImageField( upload_to='')
     raw_materials = models.ManyToManyField(
         'RawMaterial',
         related_name='products',
@@ -44,8 +44,8 @@ class ProductRawMaterial(models.Model):
 class Order(models.Model):
     date = models.DateTimeField(default=now)
     paymentMethod = models.CharField(max_length=100,default="Cash")
-    # def __str__(self):
-    #     return self.date+" "+self.paymentMethod
+    def __str__(self):
+        return self.date.strftime("%Y-%m-%d %H:%M:%S")
 
 
 class OrderItem(models.Model):
@@ -53,5 +53,5 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     def __str__(self):
-        return f"{self.product.name} {self.quantity}"
+        return f"{self.product.name} {self.quantity} {self.order.date.strftime("%Y-%m-%d %H:%M:%S")}"
 
