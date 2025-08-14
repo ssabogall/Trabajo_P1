@@ -24,17 +24,9 @@ class ProductRawMaterialAdmin(admin.ModelAdmin):
     list_filter = ('product', 'raw_material')
     ordering = ('product',)
 
-# Configuración para modelos del POS
-@admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'date', 'paymentMethod')
-    list_filter = ('date', 'paymentMethod')
-    ordering = ('-date',)
 
-@admin.register(OrderItem)
-class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ('order', 'product', 'quantity')
-    list_filter = ('order__date', 'product')
+
+
 
 """
 Comentando los modelos que no necesitamos en el admin:
