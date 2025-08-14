@@ -81,17 +81,31 @@ def update_stock(request):
     
     return JsonResponse({'success': False, 'message': 'Método no permitido'})
 
-@login_required
-@permission_required('inventory.change_rawmaterial', raise_exception=True)
 def editar_materia_prima(request, pk):
-    """Editar materia prima (desde main branch)"""
-    materia = get_object_or_404(RawMaterial, pk=pk)
-
+    """Vista para editar una materia prima desde el inventario"""
+    from django.contrib import messages
+    
+    raw_material = get_object_or_404(RawMaterial, pk=pk)
+    
     if request.method == 'POST':
-        materia.name = request.POST.get('name')
-        materia.units = request.POST.get('units')
-        materia.exp_date = request.POST.get('exp_date')
-        materia.save()
-        return redirect('inventory:inventory')
-
-    return render(request, 'inventory/editar_materia.html', {'materia': materia})
+        # Obtener datos del formulario
+        name = request.POST.get('name', '').strip()
+        units = request.POST.get('units', '').strip()
+        exp_date = request.POST.get('exp_date')
+        
+        if name and units and exp_date:
+            # Actualizar la materia prima
+            raw_material.name = name
+            raw_material.units = units
+            raw_material.exp_date = exp_date
+            raw_material.save()
+            
+            messages.success(request, f'✅ Materia prima "{name}" actualizada correctamente')
+            return redirect('inventory:inventory')
+        else:
+            messages.error(request, '❌ Todos los campos son obligatorios')
+    
+    context = {
+        'raw_material': raw_material
+    }
+    return render(request, 'inventory/editar_materia_prima.html', context)
