@@ -5,7 +5,7 @@ from django.utils.timezone import now
 
 class RawMaterial(models.Model):
     name = models.CharField(max_length=100)
-    units = models.CharField(max_length=50)
+    units = models.IntegerField(default=0)
     exp_date = models.DateField()
 
     def __str__(self):
@@ -52,4 +52,6 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+    def __str__(self):
+        return f"{self.product.name} {self.quantity}"
 

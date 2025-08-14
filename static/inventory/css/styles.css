@@ -1,8 +1,8 @@
 @charset "UTF-8";
 /*!
-* Start Bootstrap - Shop Homepage v5.0.6 (https://startbootstrap.com/template/shop-homepage)
+* Start Bootstrap - Bare v5.0.9 (https://startbootstrap.com/template/bare)
 * Copyright 2013-2023 Start Bootstrap
-* Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-shop-homepage/blob/master/LICENSE)
+* Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-bare/blob/master/LICENSE)
 */
 /*!
  * Bootstrap  v5.2.3 (https://getbootstrap.com/)
@@ -85,6 +85,100 @@
   box-sizing: border-box;
 }
 
+
+.item-anchor{
+  text-decoration: none; 
+  color: #000000;
+
+}
+.item-anchor:hover{
+  color: #00000094;
+
+}
+
+html {
+  scroll-behavior: smooth;
+}
+#navbar__logo{
+
+  display: flex;
+  align-items: left;
+  cursor: pointer;
+  width: 120px;  /* Fixed width */
+  height: 200px;  /* Fixed height */
+  max-width: 120px;  /* Prevent resizing larger than this width */
+  max-height: 120px;  /* Prevent resizing larger than this height */
+  border-radius: 8px;
+
+
+
+}
+.navbar__btn{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+.button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  padding: 10px 20px;
+  height: 100%;
+  width: 100%;
+  border: none;
+  outline: none;
+  border-radius: 4px;
+  background: #000;
+  color: #fff;
+
+}
+.button i {
+  color: white; /* Ensures visibility on a black background */
+  background: #000;
+  font-size: 20px; /* Adjust as needed */
+}
+
+.button:hover{
+  background: #00000079;
+  transition: all 0.7 ease;
+}
+.button:hover i{
+  background: #00000000;
+  transition: all 0.7 ease;
+}
+
+.into {
+  display: flex;
+  flex-direction: row; /* Stack elements vertically */
+  align-items: center; /* Center elements horizontally */
+  justify-content: center; /* Center elements vertically (if needed) */
+  text-align: center; /* Ensures text inside is centered */
+  width: 100%; /* Ensure full width */
+}
+
+.intro__img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 35%; /* Adjust as needed */
+  margin-top: 30px;
+  margin-bottom: 100px;
+}
+
+.intro .intro__logo{
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  width: 30%; /* Adjust as needed */
+  margin-top: 30px;
+  border-radius: 8px;
+}
+
+
 @media (prefers-reduced-motion: no-preference) {
   :root {
     scroll-behavior: smooth;
@@ -92,8 +186,10 @@
 }
 
 body {
+  font-family: "Libre Baskerville", serif;
+  font-weight: 600;
+  font-style: normal;
   margin: 0;
-  font-family: var(--bs-body-font-family);
   font-size: var(--bs-body-font-size);
   font-weight: var(--bs-body-font-weight);
   line-height: var(--bs-body-line-height);
@@ -102,6 +198,7 @@ body {
   background-color: var(--bs-body-bg);
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  
 }
 
 hr {
@@ -3165,6 +3262,7 @@ textarea.form-control-lg {
 
 .collapse:not(.show) {
   display: none;
+  
 }
 
 .collapsing {
@@ -3181,6 +3279,7 @@ textarea.form-control-lg {
   width: 0;
   height: auto;
   transition: width 0.35s ease;
+  
 }
 @media (prefers-reduced-motion: reduce) {
   .collapsing.collapse-horizontal {
@@ -3616,6 +3715,7 @@ textarea.form-control-lg {
   padding-left: 0;
   margin-bottom: 0;
   list-style: none;
+  
 }
 
 .nav-link {
@@ -3626,19 +3726,23 @@ textarea.form-control-lg {
   color: var(--bs-nav-link-color);
   text-decoration: none;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  text-align: center;
+  font-size: 140%;
 }
 @media (prefers-reduced-motion: reduce) {
   .nav-link {
     transition: none;
+
   }
 }
 .nav-link:hover, .nav-link:focus {
-  color: var(--bs-nav-link-hover-color);
+  color: #00000079;
 }
 .nav-link.disabled {
   color: var(--bs-nav-link-disabled-color);
   pointer-events: none;
   cursor: default;
+
 }
 
 .nav-tabs {
@@ -3669,6 +3773,7 @@ textarea.form-control-lg {
 }
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
+  
   color: var(--bs-nav-tabs-link-active-color);
   background-color: var(--bs-nav-tabs-link-active-bg);
   border-color: var(--bs-nav-tabs-link-active-border-color);
@@ -3696,6 +3801,7 @@ textarea.form-control-lg {
 }
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
+  
   color: var(--bs-nav-pills-link-active-color);
   background-color: var(--bs-nav-pills-link-active-bg);
 }
@@ -3726,17 +3832,14 @@ textarea.form-control-lg {
 }
 
 .navbar {
+  min-width: 210px;
   --bs-navbar-padding-x: 0;
   --bs-navbar-padding-y: 0.5rem;
-  --bs-navbar-color: rgba(0, 0, 0, 0.55);
-  --bs-navbar-hover-color: rgba(0, 0, 0, 0.7);
-  --bs-navbar-disabled-color: rgba(0, 0, 0, 0.3);
-  --bs-navbar-active-color: rgba(0, 0, 0, 0.9);
+
   --bs-navbar-brand-padding-y: 0.3125rem;
   --bs-navbar-brand-margin-end: 1rem;
   --bs-navbar-brand-font-size: 1.25rem;
-  --bs-navbar-brand-color: rgba(0, 0, 0, 0.9);
-  --bs-navbar-brand-hover-color: rgba(0, 0, 0, 0.9);
+
   --bs-navbar-nav-link-padding-x: 0.5rem;
   --bs-navbar-toggler-padding-y: 0.25rem;
   --bs-navbar-toggler-padding-x: 0.75rem;
@@ -3746,13 +3849,22 @@ textarea.form-control-lg {
   --bs-navbar-toggler-border-radius: 0.375rem;
   --bs-navbar-toggler-focus-width: 0.25rem;
   --bs-navbar-toggler-transition: box-shadow 0.15s ease-in-out;
-  position: relative;
+  
+  background: #ffffffb0;
+  backdrop-filter: blur(5px);
+  position: sticky;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   padding: var(--bs-navbar-padding-y) var(--bs-navbar-padding-x);
+  top: 0;
+  z-index: 1000;
+
+  /* Prevent overflow */
+  overflow: hidden;
 }
+
 .navbar > .container,
 .navbar > .container-fluid,
 .navbar > .container-sm,
@@ -3971,6 +4083,7 @@ textarea.form-control-lg {
   .navbar-expand-lg .navbar-collapse {
     display: flex !important;
     flex-basis: auto;
+    
   }
   .navbar-expand-lg .navbar-toggler {
     display: none;
@@ -5193,6 +5306,7 @@ textarea.form-control-lg {
 }
 .toast.showing {
   opacity: 0;
+  
 }
 .toast:not(.show) {
   display: none;
@@ -5336,6 +5450,7 @@ textarea.form-control-lg {
 }
 .modal-backdrop.show {
   opacity: var(--bs-backdrop-opacity);
+  
 }
 
 .modal-header {

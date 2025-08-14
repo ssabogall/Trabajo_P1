@@ -20,16 +20,18 @@ from django.urls import path, include
 
 from inventory import views as viewsInventory
 from products import views as viewsProduct
+from core import views as viewsCore
+
 
 
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('',viewsCore.landingPage),
     path('admin/', admin.site.urls),
-#     path('inventory/',viewsInventory.inventory),
-    path('products/',viewsProduct.product),
-    path('pos_view/',viewsProduct.pos_view),
+    path('products/', viewsProduct.show_available_products),
+    path('pos/',viewsProduct.pos),
     path('save_order/', viewsProduct.save_order),
     path('inventory/', include('inventory.urls')),
 
