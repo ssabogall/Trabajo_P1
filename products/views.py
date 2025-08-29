@@ -17,11 +17,6 @@ def product(request):
 
 
 
-def pos(request):
-    products = Product.objects.all()
-    return render(request,"pos.html",{ 'products': products})
-
-
 #se esta usando esta parte
 def show_available_products(request):
     q = (request.GET.get("q") or "").strip()
@@ -49,27 +44,3 @@ def show_available_products(request):
         "q": q,
         "results_count": products.count(),
     })
-
-
-@csrf_exempt  # For testing only! Use proper CSRF token handling in production
-@require_POST
-def save_order(request):
-    data = json.loads(request.body)
-    orders = data.get('orders', [])
-
-    print(orders[0]['id'])
-    product_quantity = {}
-
-    # count by ids
-    for item in orders:
-        product_quantity[item['id']] = product_quantity.get(item['id'], 0) + 1
-    
-    # # create order
-    order = Order.objects.create(paymentMethod=orders[0]['paymentMethod'])
-
-    # # create products and adding them to order
-    for id,quantity in product_quantity.items():
-        product = Product.objects.get(id=id)
-        OrderItem.objects.create(order=order, product=product, quantity=quantity)
-
-    return JsonResponse({'status': 'success'})

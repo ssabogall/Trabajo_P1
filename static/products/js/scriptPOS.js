@@ -67,6 +67,7 @@ paymentToggleBtn.addEventListener('click', () => {
     paymentToggleBtn.classList.toggle('btn-outline-primary', !isTransfer);
 });
 
+
 // Checkout
 checkoutBtn.addEventListener('click', async () => {
     const ordersToSend = orders.map(order => ({
