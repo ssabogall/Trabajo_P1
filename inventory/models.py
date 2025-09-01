@@ -14,7 +14,7 @@ class RawMaterial(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True,null=True)
     price = models.DecimalField(max_digits=7, decimal_places=0)
     quantity = models.PositiveIntegerField(default=0)
     picture = models.ImageField( upload_to='')
