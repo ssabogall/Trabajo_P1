@@ -13,8 +13,10 @@ def pos(request):
     products = Product.objects.all()
     return render(request,"pos.html",{ 'products': products})
 
-
-
+def orders(request):
+    orders = Order.objects.all()
+    items = OrderItem.objects.all()
+    return render(request,"orders.html",{ 'orders': orders,'items':items})
 
 @csrf_exempt  # For testing only! Use proper CSRF token handling in production
 @require_POST

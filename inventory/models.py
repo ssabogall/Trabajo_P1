@@ -44,9 +44,14 @@ class ProductRawMaterial(models.Model):
 class Order(models.Model):
     date = models.DateTimeField(default=now)
     paymentMethod = models.CharField(max_length=100,default="Cash")
+    # amount = models.IntegerField(default=0)
     def __str__(self):
         return self.date.strftime("%Y-%m-%d %H:%M:%S")
-
+    
+    def total_amount(self):
+        return sum(
+            item.product.price * item.quantity for item in self.orderitem_set.all()
+        )
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
