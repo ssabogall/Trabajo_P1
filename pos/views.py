@@ -23,6 +23,7 @@ def orders(request):
 def save_order(request):
     data = json.loads(request.body)
     orders = data.get('orders', [])
+    # print(data)
 
     print(orders[0]['id'])
     product_quantity = {}

@@ -52,6 +52,11 @@ class Order(models.Model):
         return sum(
             item.product.price * item.quantity for item in self.orderitem_set.all()
         )
+    def products(self):
+        return "\n".join(
+        f"{item.product.name} ({item.quantity})" for item in self.orderitem_set.all()
+    )
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

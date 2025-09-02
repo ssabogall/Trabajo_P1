@@ -33,6 +33,7 @@ urlpatterns = [
     path('pos/',viewsPOS.pos),
     path('pos/orders',viewsPOS.orders),
     path('save_order/', viewsPOS.save_order),
+    path('save_order_online/', viewsProduct.save_order_online),
     path('inventory/', include('inventory.urls')),
 
 ]

@@ -74,13 +74,15 @@ checkoutBtn.addEventListener('click', async () => {
         ...order,
         paymentMethod: isTransfer ? "Transfer" : "Cash"
     }));
-
+    
     const response = await fetch('/save_order/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orders: ordersToSend })
     });
-
+    
+    console.log(total)
+    console.log(ordersToSend)
     const data = await response.json();
     console.log('Pedido guardado', data);
 });

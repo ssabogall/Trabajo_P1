@@ -17,6 +17,8 @@
                             <tr>
                                 <th>Fecha y Hora</th>
                                 <th>Tipo Transferencia</th>
+                                <th>Productos</th>
+
                                 <th>Monto</th>
 
                             </tr>
@@ -26,6 +28,7 @@
                             <tr>
                                 <td>{{ order }}</td>
                                 <td>{{ order.paymentMethod }}</td>
+                                <td>{{ order.products|linebreaksbr }}</td>
                                 <td>{{ order.total_amount }}</td>
 
                             </tr>
@@ -41,5 +44,6 @@
         </div>
     </div>
 </div>
+
 {% endblock %}
 
