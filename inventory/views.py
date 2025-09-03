@@ -2,18 +2,19 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .models import RawMaterial
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
-from datetime import timedelta
+from django.utils.timezone import now, timedelta
 
 def inventory(request):
-    today = timezone.now().date()
-    warning_date = today + timedelta(days=5)
+    today = now().date()
+    soon = today + timedelta(days=5)
+    expiring_soon = RawMaterial.objects.filter(exp_date__lte=soon, exp_date__gte=today)
 
-    materias_primas = RawMaterial.objects.all()
-    expiring_soon = RawMaterial.objects.filter(exp_date__lte=warning_date, exp_date__gte=today).order_by('exp_date')
+    dismissed = request.GET.get("dismissed") == "1"
+    show_modal = bool(expiring_soon) and not dismissed
 
-    return render(request, 'inventory/inventory.html', {
-        'materias_primas': materias_primas,
-        'expiring_soon': expiring_soon
+    return render(request, "inventory/inventory.html", {
+        "materias_primas": RawMaterial.objects.all(),
+        "show_modal": show_modal,
     })
 
 def expiring_materials(request):
