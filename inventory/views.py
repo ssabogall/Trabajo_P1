@@ -1,13 +1,30 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import RawMaterial
 from django.contrib.auth.decorators import login_required, permission_required
+from django.utils import timezone
+from datetime import timedelta
 
 def inventory(request):
+    today = timezone.now().date()
+    warning_date = today + timedelta(days=5)
+
     materias_primas = RawMaterial.objects.all()
+    expiring_soon = RawMaterial.objects.filter(exp_date__lte=warning_date, exp_date__gte=today).order_by('exp_date')
+
     return render(request, 'inventory/inventory.html', {
-        'materias_primas': materias_primas
+        'materias_primas': materias_primas,
+        'expiring_soon': expiring_soon
     })
 
+def expiring_materials(request):
+    today = timezone.now().date()
+    warning_date = today + timedelta(days=5)
+
+    expiring_soon = RawMaterial.objects.filter(exp_date__lte=warning_date, exp_date__gte=today).order_by('exp_date')
+
+    return render(request, 'inventory/expiring_materials.html', {
+        'expiring_soon': expiring_soon
+    })
 
 @login_required
 @permission_required('inventory.change_rawmaterial', raise_exception=True)

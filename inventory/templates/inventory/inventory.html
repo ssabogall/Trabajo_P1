@@ -2,16 +2,24 @@
 
 {% block content %}
 <div class="container mt-5">
+
     <h1 class="mb-4 text-center">Raw Materials Management</h1>
+
+    {% if expiring_soon %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>🚨 Alert!!</strong> Some raw materials are about to expire.
+        <a href="{% url 'expiring_materials' %}" class="btn btn-sm btn-light ms-3">Review</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
 
     <div class="row">
         <div class="col-md-12">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     <span>Raw Materials</span>
-                    <!-- Button to create a new raw material -->
                     <a href="{% url 'create_raw_material' %}" class="btn btn-light btn-sm">
-                        ➕ Add Raw Material
+                        + Add Raw Material
                     </a>
                 </div>
                 <div class="card-body">
