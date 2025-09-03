@@ -22,3 +22,21 @@ def editar_materia_prima(request, pk):
         return redirect('inventory')
 
     return render(request, 'inventory/editar_materia.html', {'materia': materia})
+
+@login_required
+@permission_required('inventory.add_rawmaterial', raise_exception=True)
+def create_raw_material(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        units = request.POST.get('units')
+        exp_date = request.POST.get('exp_date')
+
+        RawMaterial.objects.create(
+            name=name,
+            units=units,
+            exp_date=exp_date
+        )
+        return redirect('inventory')
+
+    return render(request, 'inventory/create_raw_material.html')
+
