@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Baneton · Tablero de Ventas</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    :root { --gap:16px; --ring:#e5e7eb; }
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto; margin:0; background:#f6f7f9}
+    .wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+    .grid{display:grid;gap:var(--gap);grid-template-columns:repeat(12,1fr)}
+    .card{grid-column:span 12;background:#fff;border:1px solid var(--ring);border-radius:16px;padding:16px 20px}
+    @media(min-width:900px){.col-4{grid-column:span 4}.col-8{grid-column:span 8}.col-6{grid-column:span 6}}
+    .kpi h3{margin:0;color:#6b7280;font-size:14px}
+    .kpi strong{font-size:32px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Tablero de Ventas</h1>
+
+    <div class="grid">
+      <section class="card col-4">
+        <div class="kpi">
+          <div>
+            <h3>Ventas totales (hoy)</h3>
+            <strong id="revenue-today">$0</strong>
+            <div style="color:#6b7280;font-size:12px">Actualiza cada 5s</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card col-8">
+        <h3 style="margin:0 0 8px">Ingresos últimos 7 días</h3>
+        <canvas id="salesByDay"></canvas>
+      </section>
+
+      <section class="card col-6">
+        <h3 style="margin:0 0 8px">Top productos (hoy)</h3>
+        <canvas id="topProducts"></canvas>
+      </section>
+
+      <section class="card col-6">
+        <h3 style="margin:0 0 8px">Distribución por método de pago (hoy)</h3>
+        <canvas id="revenueByPayment"></canvas>
+      </section>
+
+      <section class="card col-4">
+        <div class="kpi">
+            <div>
+                <h3>Unidades vendidas (hoy)</h3>
+                <strong id="units-today">0</strong>
+                <div style="color:#6b7280;font-size:12px">
+                Tendencia vs ayer: <span id="units-trend">–</span>
+                </div>
+            </div>
+        </div>
+       </section>
+       
+       <section class="card col-8">
+        <h3 style="margin:0 0 8px">Unidades vendidas (últimos 7 días)</h3>
+        <canvas id="unitsByDay"></canvas>
+       </section>
+
+       <section class="card col-12">
+        <h3 style="margin:0 0 8px">Productos en tendencia (Δ unidades vs 7 días previos)</h3>
+        <canvas id="trendingProducts"></canvas>
+       </section>
+    </div>
+  </div>
+
+  <script>
+    const fmtMoney = v =>
+      new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP' }).format(v ?? 0);
+
+    const $rev = document.getElementById("revenue-today");
+
+    const salesByDay = new Chart(document.getElementById("salesByDay"), {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Ingresos', data: [] }] },
+      options: { responsive:true, animation:false }
+    });
+
+    const topProducts = new Chart(document.getElementById("topProducts"), {
+      type: 'bar',
+      data: { labels: [], datasets: [{ label: 'Cantidad', data: [] }] },
+      options: { responsive:true, animation:false }
+    });
+
+    const revenueByPayment = new Chart(document.getElementById("revenueByPayment"), {
+      type: 'doughnut',
+      data: { labels: [], datasets: [{ label: 'Ingresos', data: [] }] },
+      options: { responsive:true, animation:false }
+    });
+
+    const unitsByDay = new Chart(document.getElementById("unitsByDay"), {
+    type: 'line',
+    data: { labels: [], datasets: [{ label: 'Unidades', data: [] }] },
+    options: { responsive:true, animation:false }
+    });
+
+    const trendingProducts = new Chart(document.getElementById("trendingProducts"), {
+    type: 'bar',
+    data: { labels: [], datasets: [{ label: 'Δ unidades', data: [] }] },
+    options: { responsive:true, animation:false }
+    });
+
+    const $unitsToday = document.getElementById("units-today");
+    const $unitsTrend = document.getElementById("units-trend");
+
+    function fmtPct(p){
+        if (p === null || p === undefined) return "N/D";
+        const sign = p >= 0 ? "+" : "";
+        return `${sign}${p.toFixed(1)}%`;
+  }
+
+    async function refresh() {
+      const res = await fetch("{% url 'baneton_kpis' %}", { cache: 'no-store' });
+      const j = await res.json();
+
+      $rev.textContent = fmtMoney(j.revenue_today);
+
+      salesByDay.data.labels = j.sales_by_day.labels;
+      salesByDay.data.datasets[0].data = j.sales_by_day.data;
+      salesByDay.update('none');
+
+      topProducts.data.labels = j.top_products.labels;
+      topProducts.data.datasets[0].data = j.top_products.data;
+      topProducts.update('none');
+
+      revenueByPayment.data.labels = j.revenue_by_payment.labels;
+      revenueByPayment.data.datasets[0].data = j.revenue_by_payment.data;
+      revenueByPayment.update('none');
+      
+      $unitsToday.textContent = j.units_today ?? 0;
+      $unitsTrend.textContent  = fmtPct(j.trends.units_change_pct);
+
+      unitsByDay.data.labels = j.units_by_day.labels;
+      unitsByDay.data.datasets[0].data = j.units_by_day.data;
+      unitsByDay.update('none');
+
+      trendingProducts.data.labels = j.trending_products.labels;
+      trendingProducts.data.datasets[0].data = j.trending_products.delta;
+      trendingProducts.update('none');
+    }
+
+    refresh();
+    setInterval(refresh, 5000);
+  </script>
+</body>
+</html>
