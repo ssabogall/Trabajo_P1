@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from inventory.models import Product, Order,OrderItem
+from inventory.models import Product, Order,OrderItem, Customer
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime
@@ -25,7 +25,10 @@ def save_order(request):
     orders = data.get('orders', [])
     # print(data)
 
-    print(orders[0]['id'])
+    print(orders[0]['cedula'])
+    client = Customer.objects.create(cedula=orders[0]['cedula'],nombre=orders[0]['nombre'],correo=orders[0]['correo'])
+
+
     product_quantity = {}
 
     # count by ids
@@ -33,7 +36,7 @@ def save_order(request):
         product_quantity[item['id']] = product_quantity.get(item['id'], 0) + 1
     
     # # create order
-    order = Order.objects.create(paymentMethod=orders[0]['paymentMethod'])
+    order = Order.objects.create(customer =client, paymentMethod=orders[0]['paymentMethod'])
 
     # # create products and adding them to order
     for id,quantity in product_quantity.items():

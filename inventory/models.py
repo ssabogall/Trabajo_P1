@@ -39,9 +39,14 @@ class ProductRawMaterial(models.Model):
 
     class Meta:
         unique_together = ('product', 'material')
-        
+
+class Customer(models.Model):
+    cedula = models.CharField(max_length=100)
+    nombre = models.TextField(blank=True,null=True)
+    correo = models.EmailField(max_length = 254,blank=True,null=True)     
         
 class Order(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE,null = True,blank=True)
     date = models.DateTimeField(default=now)
     paymentMethod = models.CharField(max_length=100,default="Cash")
     # amount = models.IntegerField(default=0)
@@ -64,4 +69,6 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     def __str__(self):
         return f"{self.product.name} {self.quantity} {self.order.date.strftime("%Y-%m-%d %H:%M:%S")}"
+
+
 

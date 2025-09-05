@@ -70,10 +70,19 @@ paymentToggleBtn.addEventListener('click', () => {
 
 // Checkout
 checkoutBtn.addEventListener('click', async () => {
+    const cedula = document.getElementById("cedula").value;
+    const nombre = document.getElementById("nombre").value;
+    const correo = document.getElementById("correo").value;
+
+
     const ordersToSend = orders.map(order => ({
         ...order,
-        paymentMethod: isTransfer ? "Transfer" : "Cash"
+        paymentMethod: isTransfer ? "Transfer" : "Cash",
+        cedula:cedula,
+        nombre:nombre,
+        correo:correo
     }));
+    console.log(ordersToSend);
     
     const response = await fetch('/save_order/', {
         method: 'POST',
