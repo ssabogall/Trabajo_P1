@@ -84,7 +84,7 @@ checkoutBtn.addEventListener('click', async () => {
     }));
     console.log(ordersToSend);
     
-    const response = await fetch('/save_order/', {
+    const response = await fetch('/save_order_online/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orders: ordersToSend })

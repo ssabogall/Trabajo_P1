@@ -111,7 +111,7 @@
             if (cart.length === 0) {
                 cartEmpty.style.display = 'block';
                 cartFooter.style.display = 'none';
-                cartBody.innerHTML = '<div class="cart-empty" id="cart-empty"><i class="fas fa-shopping-cart"></i><p>Tu carrito está vacío</p></div>';
+                cartBody.innerHTML = '<div class="cart-empty" id="cart-empty"><i class="fa-solid fa-bread-slice"></i><p>Tu carrito está vacío</p></div>';
             } else {
                 cartEmpty.style.display = 'none';
                 cartFooter.style.display = 'block';
@@ -139,26 +139,35 @@
 
         
         checkoutCartBtn.addEventListener('click', async () => {
-            if (cart.length > 0) {
-                // Aquí puedes agregar la lógica para proceder al checkout
-                alert(`Procesando compra por $${cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}`);
-                console.log('Cart items:', cart);
+            // let cart = [
+            // { id: 1, name: "Product A", qty: 2 },
+            // { id: 2, name: "Product B", qty: 1 }
+            // ];
+
+            let cartString = encodeURIComponent(JSON.stringify(cart));
+            // window.location.href = "form.html?cart=" + cartString;
+            localStorage.setItem("cart", JSON.stringify(cart));
+            window.location.href = "forms";
+            // if (cart.length > 0) {
+            //     // Aquí puedes agregar la lógica para proceder al checkout
+            //     alert(`Procesando compra por $${cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}`);
+            //     console.log('Cart items:', cart);
                 
-                const ordersToSend = cart.map(cart => ({
-                    ...cart
-                }));
-                console.log('Sending orders:', ordersToSend);
+            //     const ordersToSend = cart.map(cart => ({
+            //         ...cart
+            //     }));
+            //     console.log('Sending orders:', ordersToSend);
                 
-                const response = await fetch('/save_order_online/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ orders: ordersToSend })
-                });
+            //     const response = await fetch('/save_order_online/', {
+            //         method: 'POST',
+            //         headers: { 'Content-Type': 'application/json' },
+            //         body: JSON.stringify({ orders: ordersToSend })
+            //     });
                 
                 
-                const data = await response.json();
-                console.log('Pedido guardado', data);
-                        }
+            //     const data = await response.json();
+            //     console.log('Pedido guardado', data);
+            //             }
         });
 
         // Inicializar carrito vacío

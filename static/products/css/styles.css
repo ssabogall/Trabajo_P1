@@ -1,4 +1,5 @@
         /* Carrito flotante */
+        
         .cart-icon {
             position: fixed;
             top: 20px;
@@ -28,19 +29,8 @@
         }
 
         .cart-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
+          margin-left: 10px;
+
         }
 
         /* Carrito desplegable */

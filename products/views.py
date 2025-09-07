@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from inventory.models import Product, Order,OrderItem
+from inventory.models import Product, Order,OrderItem, Customer
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime
@@ -15,7 +15,9 @@ def product(request):
     products = Product.objects.all()
     return render(request,"products.html",{ 'products': products})
 
-
+def forms(request):
+    # products = Product.objects.all()
+    return render(request,"forms.html",{ })
 
 #se esta usando esta parte
 def show_available_products(request):
@@ -51,8 +53,11 @@ def show_available_products(request):
 @require_POST
 def save_order_online(request):
     data = json.loads(request.body)
+    # client = Customer.objects.create(cedula=orders[0]['cedula'],nombre=orders[0]['nombre'],correo=orders[0]['correo'])
+    # print(data['customer'])
     
     order = Order.objects.create(paymentMethod='Transfer')
+    
     for item in data['orders']:
         product = Product.objects.get(id=item['id'])
         OrderItem.objects.create(order=order, product=product, quantity=item['quantity'])

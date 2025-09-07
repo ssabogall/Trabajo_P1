@@ -20,6 +20,8 @@
                                 <th>Productos</th>
 
                                 <th>Monto</th>
+                                <th>Nombre-Cedula</th>
+
 
                             </tr>
                         </thead>
@@ -30,6 +32,9 @@
                                 <td>{{ order.paymentMethod }}</td>
                                 <td>{{ order.products|linebreaksbr }}</td>
                                 <td>{{ order.total_amount }}</td>
+                                <td>{{ order.customer.nombre  }} - {{order.customer.cedula}}</td>
+                                
+
 
                             </tr>
                             {% empty %}
