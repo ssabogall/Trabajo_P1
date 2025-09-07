@@ -53,10 +53,9 @@ def show_available_products(request):
 @require_POST
 def save_order_online(request):
     data = json.loads(request.body)
-    # client = Customer.objects.create(cedula=orders[0]['cedula'],nombre=orders[0]['nombre'],correo=orders[0]['correo'])
-    # print(data['customer'])
-    
-    order = Order.objects.create(paymentMethod='Transfer')
+    print(data)
+    customer = Customer.objects.create( cedula=data['customer']['cedula'], nombre=data['customer']['firstName'],correo="")
+    order = Order.objects.create(customer = customer,paymentMethod='Transfer')
     
     for item in data['orders']:
         product = Product.objects.get(id=item['id'])

@@ -32,7 +32,6 @@ checkoutCartBtn.addEventListener('click', async () => {
         
         const ordersToSend = cart.map(cart => ({
             ...cart,
-              customer,
         }));
                     
         console.log('Sending orders:', ordersToSend);
@@ -41,7 +40,7 @@ checkoutCartBtn.addEventListener('click', async () => {
         const response = await fetch('/save_order_online/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orders: ordersToSend })
+            body: JSON.stringify({ orders: ordersToSend,customer:customer })
         });
         
         
