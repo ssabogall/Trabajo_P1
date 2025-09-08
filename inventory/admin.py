@@ -8,5 +8,3 @@ admin.site.register(Product)
 admin.site.register(ProductRawMaterial)
 admin.site.register(Order)
 admin.site.register(OrderItem)
-
-

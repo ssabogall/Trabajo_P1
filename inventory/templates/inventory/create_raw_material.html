@@ -2,20 +2,20 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Edit Raw Material</h2>
+    <h2>Add New Raw Material</h2>
     <form method="post">
         {% csrf_token %}
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" name="name" value="{{ materia.name }}">
+            <input type="text" class="form-control" name="name" placeholder="Enter material name" required>
         </div>
         <div class="mb-3">
             <label for="units" class="form-label">Units</label>
-            <input type="text" class="form-control" name="units" value="{{ materia.units }}">
+            <input type="text" class="form-control" name="units" placeholder="e.g. 20 kg, 10 liters" required>
         </div>
         <div class="mb-3">
             <label for="exp_date" class="form-label">Expiration Date</label>
-            <input type="date" class="form-control" name="exp_date" value="{{ materia.exp_date|date:'Y-m-d' }}">
+            <input type="date" class="form-control" name="exp_date" required>
         </div>
         <button type="submit" class="btn btn-success">Save</button>
         <a href="{% url 'inventory' %}" class="btn btn-secondary">Cancel</a>
