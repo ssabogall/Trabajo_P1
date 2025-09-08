@@ -3,7 +3,12 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4 text-center">Ventas</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-center mb-0">Ventas</h1>
+        <a href="{% url 'daily_sales_report' %}" class="btn btn-success">
+            📊 Reporte Diario
+        </a>
+    </div>
 
     <div class="row">
         <div class="col-md-12">
