@@ -29,9 +29,11 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('',viewsCore.landingPage),
     path('admin/', admin.site.urls),
-    path('products/', viewsProduct.show_available_products),
+    path('products/', include('products.urls')),
     path('pos/',viewsPOS.pos),
+    path('pos/orders',viewsPOS.orders),
     path('save_order/', viewsPOS.save_order),
+    path('save_order_online/', viewsProduct.save_order_online),
     path('inventory/', include('inventory.urls')),
 
 ]

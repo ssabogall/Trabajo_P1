@@ -1,0 +1,54 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Ventas</h1>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    Materias primas
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Fecha y Hora</th>
+                                <th>Tipo Transferencia</th>
+                                <th>Productos</th>
+
+                                <th>Monto</th>
+                                <th>Nombre-Cedula</th>
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order }}</td>
+                                <td>{{ order.paymentMethod }}</td>
+                                <td>{{ order.products|linebreaksbr }}</td>
+                                <td>{{ order.total_amount }}</td>
+                                <td>{{ order.customer.nombre  }} - {{order.customer.cedula}}</td>
+                                
+
+
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No hay materias primas registradas</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
