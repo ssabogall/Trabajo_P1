@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1 class="text-center">📊 Reporte Diario de Ventas</h1>
+            <h1 class="text-center">📊 Daily report of sales</h1>
             <h4 class="text-center text-muted">{{ report_date|date:"d/m/Y" }}</h4>
         </div>
         <div class="col-md-4 text-right">
@@ -33,7 +33,7 @@
             <div class="card bg-success text-white shadow">
                 <div class="card-body text-center">
                     <h3 class="card-title">{{ total_orders }}</h3>
-                    <p class="card-text">📋 Número de Órdenes</p>
+                    <p class="card-text">📋 Count of orders</p>
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@
             <div class="card bg-info text-white shadow">
                 <div class="card-body text-center">
                     <h3 class="card-title">{{ average_per_order|floatformat:0 }}</h3>
-                    <p class="card-text">💸 Promedio por Orden</p>
+                    <p class="card-text">💸 Average per Order</p>
                 </div>
             </div>
         </div>
@@ -52,16 +52,16 @@
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">🏆 Productos Más Vendidos</h5>
+                    <h5 class="mb-0">🏆 Product most sale</h5>
                 </div>
                 <div class="card-body">
                     {% if most_sold_products %}
                         <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Ventas</th>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Sales</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -75,7 +75,7 @@
                             </tbody>
                         </table>
                     {% else %}
-                        <p class="text-muted">No hay productos vendidos en esta fecha.</p>
+                        <p class="text-muted">dont have any product for time period.</p>
                     {% endif %}
                 </div>
             </div>
@@ -85,15 +85,15 @@
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">💳 Métodos de Pago</h5>
+                    <h5 class="mb-0">💳 form of payment</h5>
                 </div>
                 <div class="card-body">
                     {% if payment_methods %}
                         <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>Método</th>
-                                    <th>Órdenes</th>
+                                    <th>Payment Method</th>
+                                    <th>Orders</th>
                                     <th>Total</th>
                                 </tr>
                             </thead>
@@ -102,9 +102,9 @@
                                 <tr>
                                     <td>
                                         {% if method == "Cash" %}
-                                            💵 Efectivo
+                                            💵 Cash
                                         {% elif method == "Transfer" %}
-                                            🏦 Transferencia
+                                            🏦 Transfer
                                         {% else %}
                                             {{ method }}
                                         {% endif %}
@@ -116,7 +116,7 @@
                             </tbody>
                         </table>
                     {% else %}
-                        <p class="text-muted">No hay transacciones en esta fecha.</p>
+                        <p class="text-muted">dont have any transactions about time period</p>
                     {% endif %}
                 </div>
             </div>
@@ -128,16 +128,16 @@
         <div class="col-12">
             <div class="card shadow">
                 <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">📝 Detalle de Órdenes del Día</h5>
+                    <h5 class="mb-0">📝 details about daily orders</h5>
                 </div>
                 <div class="card-body">
                     {% if daily_orders %}
                         <table class="table table-bordered table-hover">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Hora</th>
-                                    <th>Método de Pago</th>
-                                    <th>Productos</th>
+                                    <th>hour</th>
+                                    <th>Payment Method</th>
+                                    <th>Products</th>
                                     <th class="text-right">Total</th>
                                 </tr>
                             </thead>
@@ -147,9 +147,9 @@
                                     <td>{{ order.date|date:"H:i" }}</td>
                                     <td>
                                         {% if order.paymentMethod == "Cash" %}
-                                            <span class="badge badge-success">💵 Efectivo</span>
+                                            <span class="badge badge-success">💵 Cash</span>
                                         {% elif order.paymentMethod == "Transfer" %}
-                                            <span class="badge badge-info">🏦 Transferencia</span>
+                                            <span class="badge badge-info">🏦 Transfer</span>
                                         {% else %}
                                             <span class="badge badge-secondary">{{ order.paymentMethod }}</span>
                                         {% endif %}
@@ -162,8 +162,8 @@
                         </table>
                     {% else %}
                         <div class="text-center py-4">
-                            <p class="text-muted">📋 No hay órdenes registradas para esta fecha.</p>
-                            <small>Selecciona otra fecha o verifica que haya ventas registradas.</small>
+                            <p class="text-muted">📋 dont have any orders for this date.</p>
+                            <small> select other time or check that there are registered sales.</small>
                         </div>
                     {% endif %}
                 </div>
@@ -175,10 +175,10 @@
     <div class="row mt-4">
         <div class="col-12 text-center">
             <a href="{% url 'orders' %}" class="btn btn-outline-primary mr-2">
-                ← Volver a Ventas
+                ← Back to Sales
             </a>
             <button onclick="window.print()" class="btn btn-outline-secondary">
-                🖨️ Imprimir Reporte
+                🖨️ Print Report
             </button>
         </div>
     </div>
