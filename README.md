@@ -181,7 +181,7 @@ Baneton/
 ### Estructura de Ramas
 - `main`: Rama principal estable
 - `simon`: Rama de desarrollo con características avanzadas
-- `santiago`: Ramas para nuevas funcionalidades
+- `santiago2`: Ramas para nuevas funcionalidades
 
 ### Flujo de Desarrollo
 1. Crear rama desde `main`
