@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-center mb-0">Ventas</h1>
+        <h1 class="text-center mb-0">Sales</h1>
         <a href="{% url 'daily_sales_report' %}" class="btn btn-success">
             📊 Daily report
         </a>
@@ -14,18 +14,18 @@
         <div class="col-md-12">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-success text-white">
-                    Materias primas
+                    Raw material
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Fecha y Hora</th>
-                                <th>Tipo Transferencia</th>
-                                <th>Productos</th>
+                                <th>Date and Time</th>
+                                <th>Transfer Type</th>
+                                <th>Products</th>
 
-                                <th>Monto</th>
-                                <th>Nombre-Cedula</th>
+                                <th>Amount</th>
+                                <th>Name-ID</th>
 
 
                             </tr>
@@ -44,7 +44,7 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4" class="text-center">No hay materias primas registradas</td>
+                                <td colspan="4" class="text-center">Don't have raw materials registered</td>
                             </tr>
                             {% endfor %}
                         </tbody>
