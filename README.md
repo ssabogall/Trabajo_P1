@@ -181,13 +181,13 @@ Baneton/
 ### Estructura de Ramas
 - `main`: Rama principal estable
 - `simon`: Rama de desarrollo con características avanzadas
-- `feature/[nombre]`: Ramas para nuevas funcionalidades
+- `santiago`: Ramas para nuevas funcionalidades
 
 ### Flujo de Desarrollo
-1. Crear rama desde `simon`
+1. Crear rama desde `main`
 2. Desarrollar la funcionalidad
 3. Hacer commit con mensajes descriptivos
-4. Crear Pull Request hacia `simon`
+4. Crear Pull Request hacia `main`
 
 ## 📝 Próximas Funcionalidades
 
