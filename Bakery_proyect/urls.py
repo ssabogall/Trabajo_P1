@@ -37,7 +37,6 @@ urlpatterns = [
     path('save_order/', viewsPOS.save_order),
     path('save_order_online/', viewsProduct.save_order_online),
     path('inventory/', include('inventory.urls')),
-   
 
 ]
 if settings.DEBUG:
