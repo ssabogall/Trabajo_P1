@@ -70,17 +70,31 @@ paymentToggleBtn.addEventListener('click', () => {
 
 // Checkout
 checkoutBtn.addEventListener('click', async () => {
+    const cedula = document.getElementById("cedula").value;
+    const nombre = document.getElementById("nombre").value;
+    const correo = document.getElementById("correo").value;
+    const customer = {
+        cedula: cedula.value.trim(),
+        nombre: nombre.value.trim(),
+        correo:correo.value.trim(),
+    };
+
+
     const ordersToSend = orders.map(order => ({
         ...order,
-        paymentMethod: isTransfer ? "Transfer" : "Cash"
-    }));
+        paymentMethod: isTransfer ? "Transfer" : "Cash",
 
-    const response = await fetch('/save_order/', {
+    }));
+    console.log(ordersToSend);
+    
+    const response = await fetch('/save_order_online/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orders: ordersToSend })
+        body: JSON.stringify({ orders: ordersToSend, customer:customer })
     });
-
+    
+    console.log(total)
+    console.log(ordersToSend)
     const data = await response.json();
     console.log('Pedido guardado', data);
 });

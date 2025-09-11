@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Raw Materials Expiring Soon</h2>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Units</th>
+                <th>Expiration Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mp in expiring_soon %}
+            <tr>
+                <td>{{ mp.name }}</td>
+                <td>{{ mp.units }}</td>
+                <td>{{ mp.exp_date }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center">No materials expiring soon</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'inventory' %}" class="btn btn-secondary">Back to Inventory</a>
+</div>
+{% endblock %}

@@ -3,22 +3,42 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4 text-center">Gestión de Materias Primas</h1>
+    <h1 class="mb-4 text-center">Raw Materials Management</h1>
 
-    <div class="row">
+    {% if show_modal %}
+    <div class="modal fade show" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true" style="display:block; background: rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="alertModalLabel">🚨 Alert!</h5>
+          </div>
+          <div class="modal-body text-center">
+            <p><strong>Some raw materials are about to expire.</strong></p>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <a href="{% url 'expiring_materials' %}" class="btn btn-danger">Review</a>
+            <a href="{% url 'inventory' %}?dismissed=1" class="btn btn-secondary">Close</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="row mt-4">
         <div class="col-md-12">
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-success text-white">
-                    Materias primas
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    Raw Materials
+                    <a href="{% url 'create_raw_material' %}" class="btn btn-light btn-sm">+ Add Raw Material</a>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Materia prima</th>
-                                <th>Unidades</th>
-                                <th>Fecha venc.</th>
-                                <th>Acciones</th>
+                                <th>Name</th>
+                                <th>Units</th>
+                                <th>Expiration Date</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -28,12 +48,12 @@
                                 <td>{{ mp.units }}</td>
                                 <td>{{ mp.exp_date }}</td>
                                 <td>
-                                    <a href="{% url 'editar_materia' mp.id %}" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="{% url 'editar_materia' mp.id %}" class="btn btn-sm btn-warning">Edit</a>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4" class="text-center">No hay materias primas registradas</td>
+                                <td colspan="4" class="text-center">No raw materials registered</td>
                             </tr>
                             {% endfor %}
                         </tbody>
