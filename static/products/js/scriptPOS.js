@@ -67,34 +67,35 @@ paymentToggleBtn.addEventListener('click', () => {
     paymentToggleBtn.classList.toggle('btn-outline-primary', !isTransfer);
 });
 
-
 // Checkout
 checkoutBtn.addEventListener('click', async () => {
-    const cedula = document.getElementById("cedula").value;
-    const nombre = document.getElementById("nombre").value;
-    const correo = document.getElementById("correo").value;
-    const customer = {
-        cedula: cedula.value.trim(),
-        nombre: nombre.value.trim(),
-        correo:correo.value.trim(),
-    };
+    alert('Procesando pedido...');
 
+    const cedula = document.getElementById("cedula")?.value || "";
+    const nombre = document.getElementById("nombre")?.value || "";
+    const correo = document.getElementById("correo")?.value || "";
+
+    const customer = {
+        cedula: cedula.trim(),
+        nombre: nombre.trim(),
+        correo: correo.trim(),
+    };
 
     const ordersToSend = orders.map(order => ({
         ...order,
         paymentMethod: isTransfer ? "Transfer" : "Cash",
-
     }));
-    console.log(ordersToSend);
-    
-    const response = await fetch('/save_order_online/', {
+
+    console.log(customer);
+
+    const response = await fetch('/save_order/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orders: ordersToSend, customer:customer })
+        body: JSON.stringify({ orders: ordersToSend, customer: customer })
     });
-    
-    console.log(total)
-    console.log(ordersToSend)
+
+    console.log(total);
+    console.log(ordersToSend);
     const data = await response.json();
     console.log('Pedido guardado', data);
 });
