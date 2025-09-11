@@ -28,11 +28,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('',viewsCore.landingPage),
+    path("", include("pos.urls")),
     path('admin/', admin.site.urls),
     path('products/', viewsProduct.show_available_products),
     path('pos/',viewsPOS.pos),
     path('save_order/', viewsPOS.save_order),
     path('inventory/', include('inventory.urls')),
+   
 
 ]
 if settings.DEBUG:
