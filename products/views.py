@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from inventory.models import Product, Order,OrderItem
+from inventory.models import Product, Order,OrderItem, Customer
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime
@@ -15,7 +15,9 @@ def product(request):
     products = Product.objects.all()
     return render(request,"products.html",{ 'products': products})
 
-
+def forms(request):
+    # products = Product.objects.all()
+    return render(request,"forms.html",{ })
 
 #se esta usando esta parte
 def show_available_products(request):
@@ -44,3 +46,19 @@ def show_available_products(request):
         "q": q,
         "results_count": products.count(),
     })
+
+
+
+@csrf_exempt  # For testing only! Use proper CSRF token handling in production
+@require_POST
+def save_order_online(request):
+    data = json.loads(request.body)
+    print(data)
+    customer = Customer.objects.create( cedula=data['customer']['cedula'], nombre=data['customer']['firstName'],correo="")
+    order = Order.objects.create(customer = customer,paymentMethod='Transfer')
+    
+    for item in data['orders']:
+        product = Product.objects.get(id=item['id'])
+        OrderItem.objects.create(order=order, product=product, quantity=item['quantity'])
+
+    return JsonResponse({'status': 'success'})

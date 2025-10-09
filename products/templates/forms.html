@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-black text-white text-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Registro Clientes
+                    </h2>
+                    <p class="mb-0 mt-2">Completa tu información</p>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form id="customerForm" method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Personal Information Section -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-user me-2"></i>Información Personal
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label fw-bold">
+                                        Nombres <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="firstName" name="first_name" required>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label fw-bold">
+                                        Apellidos <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="lastName" name="last_name" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="cedula" class="form-label fw-bold">
+                                        ID
+                                    </label>
+                                    <input type="text" class="form-control" id="cedula" name="cedula">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label fw-bold">
+                                        Número celular
+                                    </label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="+57 300 123 4567">
+                                </div>
+                            </div>
+
+                            
+                        </div>
+                        
+                        <!-- Address Information Section -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-map-marker-alt me-2"></i>Dirección
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="address" class="form-label fw-bold">
+                                    Dirección <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="address" name="address" required 
+                                       placeholder="123 Main Street">
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="city" class="form-label fw-bold">
+                                        Ciudad <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="city" name="city" required placeholder="Bogotá">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="neighborhood" class="form-label fw-bold">
+                                        Barrio
+                                    </label>
+                                    <input type="text" class="form-control" id="neighborhood" name="neighborhood" placeholder="Zona Rosa">
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-dark btn-lg px-4" id="checkout">
+                                <i class="fas fa-save me-2"></i>Save Customer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'products/js/scriptForms.js' %}"></script>
+{% endblock %}
