@@ -1,139 +1,62 @@
+{% extends "base_products.html" %}
+{% block content %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title>Banetón</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
-    <!-- Core theme CSS (includes Bootstrap) -->
-    <link href="{% static 'inventory/css/styles.css' %}" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-        <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
-    <!-- Core theme CSS (includes Bootstrap) -->
-    <link href="{% static 'products/css/styles.css' %}" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    
-</head>
-<body>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <!-- Logo que lleva a landingpage -->
-            <a href="/" id="navbar__logo">
-                <img src="{% static 'images/baneton.png' %}" alt="LOGO">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="#intro">Información</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#footer">Contacto</a></li>
-                    <li class="nav-item navbar__btn">
-                        <div class="nav-item button" id="cart-icon">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                            <span class="cart-badge" id="cart-badge">0</span>
-
-                        </div>
-                    </li>
 
 
-
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-
-    <!-- Carrito desplegable -->
-    <div class="cart-dropdown" id="cart-dropdown">
-        <div class="cart-dropdown-header">
-            <h5>Mi Carrito</h5>
-            <button class="cart-close" id="cart-close">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="cart-dropdown-body" id="cart-body">
-            <div class="cart-empty" id="cart-empty">
-                <i class="fas fa-shopping-cart"></i>
-                <p>Tu carrito está vacío</p>
-            </div>
-        </div>
-        <div class="cart-dropdown-footer" id="cart-footer" style="display: none;">
-            <div class="cart-total">
-                Total: $<span id="cart-total">0.00</span>
-            </div>
-            <div class="cart-actions">
-                <button class="btn-clear" id="clear-cart">Limpiar</button>
-                <button class="btn-checkout" id="checkout-cart" href="forms">Comprar</button>
-            </div>
-        </div>
+<!-- Buscador -->
+<section class="py-3">
+    <div class="container px-4 px-lg-5">
+    <form method="get" class="d-flex" role="search">
+        <input class="form-control me-2" type="search" name="q"
+                placeholder="Buscar productos..." value="{{ q }}">
+        <button class="btn btn-outline-dark" type="submit">Buscar</button>
+    </form>
+    {% if q %}
+        <small class="text-muted d-block mt-2">
+        Resultados para "<strong>{{ q }}</strong>": {{ results_count }}
+        </small>
+    {% endif %}
     </div>
+</section>
 
-    
-    <!-- Buscador -->
-    <section class="py-3">
-      <div class="container px-4 px-lg-5">
-        <form method="get" class="d-flex" role="search">
-          <input class="form-control me-2" type="search" name="q"
-                 placeholder="Buscar productos..." value="{{ q }}">
-          <button class="btn btn-outline-dark" type="submit">Buscar</button>
-        </form>
-        {% if q %}
-          <small class="text-muted d-block mt-2">
-            Resultados para "<strong>{{ q }}</strong>": {{ results_count }}
-          </small>
-        {% endif %}
-      </div>
-    </section>
-
-    {% if products %}
-        <section class="py-5">
-        <div class="container px-4 px-lg-5 mt-5">
-            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-    {% for product in products %}
-                        <div class="col mb-5">
-                            <div class="card h-100">
-                                <img class="card-img-top" src="{{ product.picture.url }}" alt="{{ product.name }}">
-                                <div class="card-body p-4">
-                                    <div class="text-center">
-                                        <a href="{% url 'product_detail' product.id %}" class="product-link">
-                                            <h5 class="fw-bolder">{{ product.name }}</h5>
-                                        </a>
-                                        ${{ product.price }}
-                                    </div>
+{% if products %}
+    <section class="py-5">
+    <div class="container px-4 px-lg-5 mt-5">
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+{% for product in products %}
+                    <div class="col mb-5">
+                        <div class="card h-100">
+                            <img class="card-img-top" src="{{ product.picture.url }}" alt="{{ product.name }}">
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <a href="{% url 'product_detail' product.id %}" class="product-link">
+                                        <h5 class="fw-bolder">{{ product.name }}</h5>
+                                    </a>
+                                    ${{ product.price }}
                                 </div>
-                                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                    <div class="text-center">
-                                        <button 
-                                            class="btn btn-outline-dark mt-auto add-to-cart-btn"
-                                            data-name="{{ product.name }}"
-                                            data-price="{{ product.price }}"
-                                            data-id="{{ product.id }}"
-                                        >
-                                            <i class="fas fa-cart-plus me-1"></i>Agregar
-                                        </button>
-                                    </div>
+                            </div>
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center">
+                                    <button 
+                                        class="btn btn-outline-dark mt-auto add-to-cart-btn"
+                                        data-name="{{ product.name }}"
+                                        data-price="{{ product.price }}"
+                                        data-id="{{ product.id }}"
+                                    >
+                                        <i class="fas fa-cart-plus me-1"></i>Agregar
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
-            </div>
+                    </div>
+                {% endfor %}
         </div>
-        </section>
-    {% else %}
-        <p>No hay productos disponibles.</p>
-    {% endif %}
+    </div>
+    </section>
+{% else %}
+    <p>No hay productos disponibles.</p>
+{% endif %}
 
 
     <script src="{% static 'products/js/scriptProducts.js' %}"></script>
+{% endblock %}

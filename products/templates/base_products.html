@@ -69,15 +69,21 @@
                 <p>Tu carrito está vacío</p>
             </div>
         </div>
+
         <div class="cart-dropdown-footer" id="cart-footer" style="display: none;">
             <div class="cart-total">
                 Total: $<span id="cart-total">0.00</span>
             </div>
-            <div class="cart-actions">
-                <button class="btn-clear" id="clear-cart">Limpiar</button>
-                <button class="btn-checkout" id="checkout-cart" href="forms">Comprar</button>
-            </div>
+    <div class="cart-actions d-flex gap-2 px-2">
+<button class="btn-clear" id="clear-cart">Limpiar</button>
+        <a class="btn btn-primary flex-fill" id="checkout-cart" href="{% url 'products_forms' %}">
+            <i class="fas fa-credit-card me-1"></i> Comprar
+        </a>
+    </div>
         </div>
+
+
+        
     </div>
 
 {% block content %}

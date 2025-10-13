@@ -15,9 +15,18 @@
                 </div>
                 
                 <div class="card-body p-4">
-                    <form id="customerForm" method="post">
+                    <form id="customerForm" method="post" novalidate>
                         {% csrf_token %}
                         
+                        <!-- Global form errors -->
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
                         <!-- Personal Information Section -->
                         <div class="mb-4">
                             <h5 class="border-bottom pb-2 mb-3">
@@ -29,34 +38,48 @@
                                     <label for="firstName" class="form-label fw-bold">
                                         Nombres <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control" id="firstName" name="first_name" required>
+                                    <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" 
+                                           id="firstName" name="first_name" value="{{ form.first_name.value|default_if_none:'' }}" required>
+                                    {% for error in form.first_name.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
                                 </div>
                                 
                                 <div class="col-md-6 mb-3">
                                     <label for="lastName" class="form-label fw-bold">
                                         Apellidos <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control" id="lastName" name="last_name" required>
+                                    <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" 
+                                           id="lastName" name="last_name" value="{{ form.last_name.value|default_if_none:'' }}" required>
+                                    {% for error in form.last_name.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="cedula" class="form-label fw-bold">
-                                        ID
+                                        ID <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control" id="cedula" name="cedula">
+                                    <input type="text" class="form-control {% if form.cedula.errors %}is-invalid{% endif %}" 
+                                           id="cedula" name="cedula" value="{{ form.cedula.value|default_if_none:'' }}" required>
+                                    {% for error in form.cedula.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
                                 </div>
                                 
                                 <div class="col-md-6 mb-3">
                                     <label for="phone" class="form-label fw-bold">
-                                        Número celular
+                                        Número celular <span class="text-danger">*</span>
                                     </label>
-                                    <input type="tel" class="form-control" id="phone" name="phone" placeholder="+57 300 123 4567">
+                                    <input type="tel" class="form-control {% if form.phone.errors %}is-invalid{% endif %}" 
+                                           id="phone" name="phone" value="{{ form.phone.value|default_if_none:'' }}" required placeholder="+57 300 123 4567">
+                                    {% for error in form.phone.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
                                 </div>
                             </div>
-
-                            
                         </div>
                         
                         <!-- Address Information Section -->
@@ -69,8 +92,11 @@
                                 <label for="address" class="form-label fw-bold">
                                     Dirección <span class="text-danger">*</span>
                                 </label>
-                                <input type="text" class="form-control" id="address" name="address" required 
-                                       placeholder="123 Main Street">
+                                <input type="text" class="form-control {% if form.address.errors %}is-invalid{% endif %}" 
+                                       id="address" name="address" value="{{ form.address.value|default_if_none:'' }}" required placeholder="123 Main Street">
+                                {% for error in form.address.errors %}
+                                    <div class="invalid-feedback">{{ error }}</div>
+                                {% endfor %}
                             </div>
                             
                             <div class="row">
@@ -78,24 +104,30 @@
                                     <label for="city" class="form-label fw-bold">
                                         Ciudad <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control" id="city" name="city" required placeholder="Bogotá">
+                                    <input type="text" class="form-control {% if form.city.errors %}is-invalid{% endif %}" 
+                                           id="city" name="city" value="{{ form.city.value|default_if_none:'' }}" required placeholder="Bogotá">
+                                    {% for error in form.city.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
                                 </div>
                                 
                                 <div class="col-md-6 mb-3">
                                     <label for="neighborhood" class="form-label fw-bold">
-                                        Barrio
+                                        Barrio <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" class="form-control" id="neighborhood" name="neighborhood" placeholder="Zona Rosa">
+                                    <input type="text" class="form-control {% if form.neighborhood.errors %}is-invalid{% endif %}" 
+                                           id="neighborhood" name="neighborhood" value="{{ form.neighborhood.value|default_if_none:'' }}" required placeholder="Zona Rosa">
+                                    {% for error in form.neighborhood.errors %}
+                                        <div class="invalid-feedback">{{ error }}</div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
-
-                        
                         
                         <!-- Submit Button -->
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <button type="submit" class="btn btn-dark btn-lg px-4" id="checkout">
-                                <i class="fas fa-save me-2"></i>Save Customer
+                                <i class="fas fa-save me-2"></i>Guardar Cliente
                             </button>
                         </div>
                     </form>
