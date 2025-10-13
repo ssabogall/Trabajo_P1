@@ -62,3 +62,7 @@ def save_order_online(request):
         OrderItem.objects.create(order=order, product=product, quantity=item['quantity'])
 
     return JsonResponse({'status': 'success'})
+
+def product_detail(request, product_id):
+    product = Product.objects.get(id=product_id)
+    return render(request, 'product_detail.html', {'product': product})
