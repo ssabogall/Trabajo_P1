@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
-from inventory.models import Product, Order,OrderItem, Customer
+from inventory.models import Product, Order,OrderItem, Customer, Comment
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime
@@ -62,3 +62,27 @@ def save_order_online(request):
         OrderItem.objects.create(order=order, product=product, quantity=item['quantity'])
 
     return JsonResponse({'status': 'success'})
+
+def product_detail(request, product_id):
+    product = Product.objects.get(id=product_id)
+    comments = product.comments.all()
+    return render(request, 'product_detail.html', {'product': product,'comments': comments})
+
+
+@csrf_exempt
+@require_POST
+def add_comment(request, product_id):
+    if request.method == 'POST':
+        product = Product.objects.get(id=product_id)
+        name = request.POST.get('name')
+        comment_text = request.POST.get('comment')
+        
+        if name and comment_text:
+            Comment.objects.create(
+                product=product,
+                name=name,
+                text=comment_text
+            )
+        return redirect('product_detail', product_id=product_id)
+    
+    return redirect('products_home')
