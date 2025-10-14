@@ -1,3 +1,4 @@
+
 # 🥖 Sistema de Gestión Baneton
 
 **Proyecto Integrador 1 - Ingeniería de Sistemas**  
@@ -101,12 +102,13 @@ Baneton/
    ```
 
 2. **Crear entorno virtual**
+   - Para crear un entorno virtual y aislar las dependencias de tu proyecto, ejecuta los siguientes comandos:
    ```bash
    python -m venv venv
-   
+
    # En Windows:
-   venv\Scripts\activate
-   
+   .\venv\Scripts\Activate.ps1
+
    # En Linux/Mac:
    source venv/bin/activate
    ```
@@ -121,17 +123,35 @@ Baneton/
    python manage.py migrate
    ```
 
-5. **Crear superusuario (opcional)**
+5. **Cargar datos automáticamente (opcional)**
+   - Si deseas evitar ejecutar manualmente los comandos de migración y carga de datos, puedes usar el script `load_data.sh` que contiene todos los pasos necesarios para poblar la base de datos con datos iniciales.
+
+   Para ejecutar el script de carga de datos automáticamente, simplemente ejecuta el siguiente comando en la terminal:
+
+   ```bash
+   bash load_data.sh
+   ```
+
+   Este script ejecutará:
+   - `python manage.py makemigrations`
+   - `python manage.py migrate`
+   - `python manage.py ad_products_db`
+   - `python manage.py ad_materials_db`
+   - `python manage.py ad_materialsProducts_db`
+
+   También puedes ejecutar cada uno de esos comandos manualmente si prefieres hacerlo de forma individual.
+
+6. **Crear superusuario (opcional)**
    ```bash
    python manage.py createsuperuser
    ```
 
-6. **Ejecutar servidor de desarrollo**
+7. **Ejecutar servidor de desarrollo**
    ```bash
    python manage.py runserver
    ```
 
-7. **Acceder al sistema**
+8. **Acceder al sistema**
    - Aplicación principal: `http://127.0.0.1:8000/`
    - Panel de administración: `http://127.0.0.1:8000/admin/`
 
