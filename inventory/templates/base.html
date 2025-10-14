@@ -14,6 +14,7 @@
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -133,9 +134,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarMenu">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#products">Nuestros Productos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#about">Sobre Nosotros</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">Contáctanos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'products' %}">Nuestros Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Sobre Nosotros</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contacto">Contáctenos</a></li>
                     <li class="nav-item navbar__btn">
                         <a href="/products/" class="button" target="_blank">
                             <i class="fa-solid fa-bread-slice"></i>
@@ -152,7 +153,7 @@
     </div>
 
     <!-- Footer -->
-    <footer id="footer" class="text-center">
+    <footer id="contacto" class="text-center">
         <div class="container">
             <img src="{% static 'images/baneton.png' %}" alt="Banetón" style="width: 100px; margin-bottom: 1rem;">
             <h5>Sánduches y Panes de Masa Madre</h5>
