@@ -1,14 +1,17 @@
-{% extends "base.html" %}
+{% extends 'admin/base_admin.html' %}
+{% load static %}
+
 {% block content %}
-<div class="text-center">
-    <button onclick="location.href='/'" class="btn btn-outline-dark mt-2">Home</button>
-    <button onclick="location.href='/admin/'" class="btn btn-outline-dark mt-2">Admin</button>
-    <button onclick="location.href='/products/'" class="btn btn-outline-dark mt-2">Products</button>
-    <button onclick="location.href='/pos/'" class="btn btn-outline-dark mt-2">POS</button>
-    <button onclick="location.href='/inventory/'" class="btn btn-outline-dark mt-2">Inventory</button>
-    <button onclick="location.href='/pos/orders'" class="btn btn-outline-dark mt-2">orders</button>
-    <button onclick="location.href='/admin/baneton/'" class="btn btn-outline-dark mt-2">BI</button>
-    
-    
-</div>
+<section class="text-center py-5" 
+        style="background-color: #FFF3E0; 
+               background-image: url('{% static "images/patron_pan.jpg" %}'); 
+               background-repeat: repeat; 
+               background-size: contain;">
+    <h1 class="fw-bold" 
+        style="color: #6B4F3B; 
+               font-family: 'Poppins', sans-serif; 
+               letter-spacing: 1px;">
+        PANEL DE ADMINISTRACIÓN
+    </h1>
+</section>
 {% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Encabezado con fondo e ícono de pan -->
+<section class="text-center py-5" style="background-color: #FFF3E0; background-image: url('{% static 'images/patron_pan.jpg' %}'); background-repeat: repeat; background-size: contain;">
+    <h1 class="fw-bold" style="color: #6B4F3B; font-family: 'Poppins', sans-serif; letter-spacing: 1px;">SOBRE NOSOTROS</h1>
+</section>
+
+<!-- Sección principal -->
+<section class="container py-5" id="nosotros">
+    <div class="row align-items-center">
+        <div class="col-md-6 text-center">
+            <img src="{% static 'images/pan3.jpg' %}" alt="Banetón Panadería" class="img-fluid rounded shadow-sm" style="max-width: 80%;">
+        </div>
+
+        <div class="col-md-6 text-center mt-5">
+            <h3 class="fw-bold mb-3" style="color: #6B4F3B;">Nuestra Misión</h3>
+            <p style="color:#4b3d2a;">
+                En <strong>Banetón</strong>, nuestra misión es ofrecer productos de panadería elaborados con 
+                <strong>masa madre y los mejores ingredientes naturales</strong>, cuidando cada detalle para brindar un 
+                sabor auténtico y saludable. Buscamos fortalecer la tradición panadera mientras apoyamos el desarrollo local 
+                y la sostenibilidad ambiental.
+            </p>
+
+            <h3 class="fw-bold mt-4 mb-3 text-center mt-5" style="color: #6B4F3B;">Nuestra Visión</h3>
+            <p style="color:#4b3d2a;">
+                Ser reconocidos como una <strong>panadería artesanal líder</strong> que combina innovación, 
+                calidad y calidez humana, llevando la experiencia Banetón a cada hogar a través de una plataforma 
+                moderna y eficiente.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section class="text-center py-3"  style="color: #8E9775;">
+    <blockquote class="fs-3" 
+        style="font-family: 'Caveat', cursive; font-weight: 550; letter-spacing: 1px;">
+        Hecho con masa madre, pasión y amor por lo artesanal.
+    </blockquote>
+</section>
+{% endblock %}
