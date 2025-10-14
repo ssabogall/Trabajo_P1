@@ -34,6 +34,9 @@
                             </div>
                         {% endfor %}
                     </div>
+                    
+                    <!-- Include pagination component -->
+                    {% include 'partials/pagination.html' %}
                 {% else %}
                     <p>No hay productos disponibles.</p>
                 {% endif %}

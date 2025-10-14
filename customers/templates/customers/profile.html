@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-user-circle me-2"></i>My Profile</h1>
+                <a href="{% url 'customer_logout' %}" class="btn btn-outline-danger">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="row">
+        <!-- Customer Information -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>Name:</strong>
+                        <p class="mb-1">{{ customer.nombre }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>ID Number:</strong>
+                        <p class="mb-1">{{ customer.cedula }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email:</strong>
+                        <p class="mb-1">{{ customer.correo }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Phone:</strong>
+                        <p class="mb-1">{{ customer_profile.phone|default:"Not provided" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Address:</strong>
+                        <p class="mb-1">{{ customer_profile.address|default:"Not provided" }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Member since:</strong>
+                        <p class="mb-1">{{ customer_profile.registration_date|date:"F d, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purchase History -->
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-shopping-bag me-2"></i>Recent Purchases</h5>
+                </div>
+                <div class="card-body">
+                    {% if orders %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Products</th>
+                                        <th>Payment Method</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.date|date:"M d, Y H:i" }}</td>
+                                        <td>
+                                            <small>{{ order.products|linebreaksbr }}</small>
+                                        </td>
+                                        <td>
+                                            {% if order.paymentMethod == "Cash" %}
+                                                <span class="badge bg-success">💵 Cash</span>
+                                            {% elif order.paymentMethod == "Transfer" %}
+                                                <span class="badge bg-info">🏦 Transfer</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ order.paymentMethod }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td><strong>${{ order.total_amount|floatformat:0 }}</strong></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">You haven't made any purchases yet.</p>
+                            <a href="/products/" class="btn btn-primary">
+                                <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Future: Shopping List Section -->
+            <div class="card shadow mt-4">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Automatic Shopping List</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center py-4">
+                        <i class="fas fa-magic fa-3x text-warning mb-3"></i>
+                        <p class="text-muted">
+                            Your automatic shopping list will appear here based on your purchase history.
+                        </p>
+                        <small class="text-muted">Coming soon!</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
