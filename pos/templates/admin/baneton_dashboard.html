@@ -4,7 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Baneton · Tablero de Ventas</title>
+
+  <!-- Chart.js + plugin de etiquetas -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <script>Chart.register(ChartDataLabels);</script>
+
   <style>
     :root { --gap:16px; --ring:#e5e7eb; }
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto; margin:0; background:#f6f7f9}
@@ -14,12 +19,15 @@
     @media(min-width:900px){.col-4{grid-column:span 4}.col-8{grid-column:span 8}.col-6{grid-column:span 6}}
     .kpi h3{margin:0;color:#6b7280;font-size:14px}
     .kpi strong{font-size:32px}
+
+    /* Centrar visualmente la gráfica de Top productos */
+    .chart-center{display:flex; justify-content:center;}
+    .chart-center canvas{max-width:640px; width:100%;}
   </style>
 </head>
 <body>
   <div class="wrap">
-   <a href="/"><h1>Tablero de Ventas</h1></a> 
-
+    <a href="/"><h1>Tablero de Ventas</h1></a>
 
     <div class="grid">
       <section class="card col-4">
@@ -39,7 +47,9 @@
 
       <section class="card col-6">
         <h3 style="margin:0 0 8px">Top productos (hoy)</h3>
-        <canvas id="topProducts"></canvas>
+        <div class="chart-center">
+          <canvas id="topProducts"></canvas>
+        </div>
       </section>
 
       <section class="card col-6">
@@ -49,101 +59,184 @@
 
       <section class="card col-4">
         <div class="kpi">
-            <div>
-                <h3>Unidades vendidas (hoy)</h3>
-                <strong id="units-today">0</strong>
-                <div style="color:#6b7280;font-size:12px">
-                Tendencia vs ayer: <span id="units-trend">–</span>
-                </div>
+          <div>
+            <h3>Unidades vendidas (hoy)</h3>
+            <strong id="units-today">0</strong>
+            <div style="color:#6b7280;font-size:12px">
+              Tendencia vs ayer: <span id="units-trend">–</span>
             </div>
+          </div>
         </div>
-       </section>
-       
-       <section class="card col-8">
+      </section>
+
+      <section class="card col-8">
         <h3 style="margin:0 0 8px">Unidades vendidas (últimos 7 días)</h3>
         <canvas id="unitsByDay"></canvas>
-       </section>
+      </section>
 
-       <section class="card col-12">
+      <section class="card col-12">
         <h3 style="margin:0 0 8px">Productos en tendencia (Δ unidades vs 7 días previos)</h3>
         <canvas id="trendingProducts"></canvas>
-       </section>
+      </section>
     </div>
   </div>
 
   <script>
+    // ===== Paletas / Colores =====
+    const PALETTE = [
+      "#4e79a7","#f28e2b","#e15759","#76b7b2","#59a14f","#edc948",
+      "#b07aa1","#ff9da7","#9c755f","#bab0ab","#6f4e7c","#86bc86"
+    ];
+    const colorAt = i => PALETTE[i % PALETTE.length];
+
+    // Colores fijos por método de pago (todos distintos)
+    const FIXED_METHOD_COLORS = {
+      "Cash":       "#4e79a7",  // azul
+      "Efectivo":   "#4e79a7",
+      "Transfer":   "#f28e2b",  // naranja
+      "Transferencia": "#f28e2b",
+      "Tarjeta":    "#e15759",  // rojo
+      "Nequi":      "#76b7b2",  // turquesa
+      "Daviplata":  "#59a14f",  // verde
+      "N/D":        "#9c755f"
+    };
+
+    // Color estable para métodos no mapeados (hash → índice)
+    function colorForMethod(method, idx){
+      if (FIXED_METHOD_COLORS[method]) return FIXED_METHOD_COLORS[method];
+      // hash determinístico para que siempre sea el mismo color por método
+      let h = 0;
+      for (let i=0; i<method.length; i++) h = (h*31 + method.charCodeAt(i)) >>> 0;
+      const pos = h % PALETTE.length;
+      return PALETTE[pos];
+    }
+
+    // ===== Utilidades =====
     const fmtMoney = v =>
       new Intl.NumberFormat('es-CO', { style:'currency', currency:'COP' }).format(v ?? 0);
+    const fmtPct = p => (p==null ? "N/D" : `${p>=0?'+':''}${p.toFixed(1)}%`);
 
+    // ===== Opciones comunes para datalabels (barras) =====
+    const barDatalabels = {
+      color:'#111', anchor:'end', align:'top', offset:4, clamp:true, clip:false,
+      font:{ weight:'bold' },
+      formatter: (v)=> (Number.isFinite(v) ? v : '')
+    };
+
+    // ===== Instancias de charts =====
     const $rev = document.getElementById("revenue-today");
-
-    const salesByDay = new Chart(document.getElementById("salesByDay"), {
-      type: 'line',
-      data: { labels: [], datasets: [{ label: 'Ingresos', data: [] }] },
-      options: { responsive:true, animation:false }
-    });
-
-    const topProducts = new Chart(document.getElementById("topProducts"), {
-      type: 'bar',
-      data: { labels: [], datasets: [{ label: 'Cantidad', data: [] }] },
-      options: { responsive:true, animation:false }
-    });
-
-    const revenueByPayment = new Chart(document.getElementById("revenueByPayment"), {
-      type: 'doughnut',
-      data: { labels: [], datasets: [{ label: 'Ingresos', data: [] }] },
-      options: { responsive:true, animation:false }
-    });
-
-    const unitsByDay = new Chart(document.getElementById("unitsByDay"), {
-    type: 'line',
-    data: { labels: [], datasets: [{ label: 'Unidades', data: [] }] },
-    options: { responsive:true, animation:false }
-    });
-
-    const trendingProducts = new Chart(document.getElementById("trendingProducts"), {
-    type: 'bar',
-    data: { labels: [], datasets: [{ label: 'Δ unidades', data: [] }] },
-    options: { responsive:true, animation:false }
-    });
-
     const $unitsToday = document.getElementById("units-today");
     const $unitsTrend = document.getElementById("units-trend");
 
-    function fmtPct(p){
-        if (p === null || p === undefined) return "N/D";
-        const sign = p >= 0 ? "+" : "";
-        return `${sign}${p.toFixed(1)}%`;
-  }
+    // Líneas
+    const salesByDay = new Chart(document.getElementById("salesByDay"), {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Ingresos', data: [] }] },
+      options: { responsive:true, animation:{ duration: 0 } }
+    });
 
+    const unitsByDay = new Chart(document.getElementById("unitsByDay"), {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Unidades', data: [] }] },
+      options: { responsive:true, animation:{ duration: 0 } }
+    });
+
+    // Barras (multicolor + números)
+    const topProducts = new Chart(document.getElementById("topProducts"), {
+      type: 'bar',
+      data: { labels: [], datasets: [{
+        label: 'Cantidad', data: [], backgroundColor: [], borderColor: [], borderWidth:1
+      }] },
+      options: {
+        responsive:true, animation:{ duration: 0 },
+        layout:{ padding:{ top: 12 }},
+        maintainAspectRatio: true,
+        scales:{ y:{ beginAtZero:true, ticks:{ precision:0 }}},
+        plugins:{ legend:{ display:true }, datalabels: barDatalabels }
+      }
+    });
+
+    const trendingProducts = new Chart(document.getElementById("trendingProducts"), {
+      type: 'bar',
+      data: { labels: [], datasets: [{
+        label: 'Δ unidades', data: [], backgroundColor: [], borderColor: [], borderWidth:1
+      }] },
+      options: {
+        responsive:true, animation:{ duration: 0 },
+        layout:{ padding:{ top: 12 }},
+        scales:{ y:{ beginAtZero:true, ticks:{ precision:0 }}},
+        plugins:{ legend:{ display:true }, datalabels: barDatalabels }
+      }
+    });
+
+    // Doughnut (color por método + % y monto + etiquetas)
+    const revenueByPayment = new Chart(document.getElementById("revenueByPayment"), {
+      type: 'doughnut',
+      data: { labels: [], datasets: [{
+        label: 'Ingresos', data: [], backgroundColor: [], borderColor:'#fff', borderWidth:2
+      }] },
+      options: {
+        responsive:true, animation:{ duration: 0 },
+        layout:{ padding: 12 },
+        plugins:{
+          legend:{ position:'bottom' },
+          tooltip:{ callbacks:{ label:(ctx)=>{
+            const val = ctx.raw ?? 0;
+            const total = (ctx.dataset.data||[]).reduce((a,b)=>a+(b||0),0);
+            const pct = total ? (val*100/total).toFixed(1) : 0;
+            return `${ctx.label}: ${fmtMoney(val)} (${pct}%)`;
+          }}},
+          datalabels:{
+            color:'#111',
+            font:{ weight:'bold' },
+            formatter:(value, ctx)=>{
+              const total=(ctx.dataset.data||[]).reduce((a,b)=>a+(b||0),0);
+              const pct = total ? Math.round(value*100/total) : 0;
+              return `${pct}%\n${fmtMoney(value)}`;
+            }
+          }
+        }
+      }
+    });
+
+    // ===== Carga/refresh de datos =====
     async function refresh() {
-      const res = await fetch("{% url 'baneton_kpis' %}", { cache: 'no-store' });
+      const res = await fetch("{% url 'baneton_kpis' %}", { cache: 'no-store', credentials: 'same-origin' });
       const j = await res.json();
 
+      // KPIs
       $rev.textContent = fmtMoney(j.revenue_today);
+      $unitsToday.textContent = j.units_today ?? 0;
+      $unitsTrend.textContent = fmtPct(j.trends.units_change_pct);
 
+      // Líneas
       salesByDay.data.labels = j.sales_by_day.labels;
       salesByDay.data.datasets[0].data = j.sales_by_day.data;
-      salesByDay.update('none');
-
-      topProducts.data.labels = j.top_products.labels;
-      topProducts.data.datasets[0].data = j.top_products.data;
-      topProducts.update('none');
-
-      revenueByPayment.data.labels = j.revenue_by_payment.labels;
-      revenueByPayment.data.datasets[0].data = j.revenue_by_payment.data;
-      revenueByPayment.update('none');
-      
-      $unitsToday.textContent = j.units_today ?? 0;
-      $unitsTrend.textContent  = fmtPct(j.trends.units_change_pct);
+      salesByDay.update();
 
       unitsByDay.data.labels = j.units_by_day.labels;
       unitsByDay.data.datasets[0].data = j.units_by_day.data;
-      unitsByDay.update('none');
+      unitsByDay.update();
+
+      // Barras (multicolor)
+      topProducts.data.labels = j.top_products.labels;
+      topProducts.data.datasets[0].data = j.top_products.data;
+      topProducts.data.datasets[0].backgroundColor = j.top_products.data.map((_, i) => colorAt(i));
+      topProducts.data.datasets[0].borderColor     = j.top_products.data.map((_, i) => colorAt(i));
+      topProducts.update();
 
       trendingProducts.data.labels = j.trending_products.labels;
       trendingProducts.data.datasets[0].data = j.trending_products.delta;
-      trendingProducts.update('none');
+      trendingProducts.data.datasets[0].backgroundColor = j.trending_products.delta.map((_, i) => colorAt(i));
+      trendingProducts.data.datasets[0].borderColor     = j.trending_products.delta.map((_, i) => colorAt(i));
+      trendingProducts.update();
+
+      // Doughnut (color por método — cada método distinto)
+      revenueByPayment.data.labels = j.revenue_by_payment.labels;
+      revenueByPayment.data.datasets[0].data = j.revenue_by_payment.data;
+      revenueByPayment.data.datasets[0].backgroundColor =
+        j.revenue_by_payment.labels.map((m,i)=>colorForMethod(m,i));
+      revenueByPayment.update();
     }
 
     refresh();

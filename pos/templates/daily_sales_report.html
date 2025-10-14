@@ -2,197 +2,184 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h1 class="text-center">📊 Daily report of sales</h1>
-            <h4 class="text-center text-muted">{{ report_date|date:"d/m/Y" }}</h4>
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="text-center">📊 Daily report of sales</h1>
+      <h4 class="text-center text-muted">{{ report_date|date:"d/m/Y" }}</h4>
+    </div>
+    <div class="col-md-4 text-right">
+      <form method="GET" class="form-inline justify-content-end">
+        <div class="form-group">
+          <label for="date" class="sr-only">Fecha:</label>
+          <input type="date" id="date" name="date" class="form-control mr-2"
+                 value="{{ report_date|date:'Y-m-d' }}">
         </div>
-        <div class="col-md-4 text-right">
-            <form method="GET" class="form-inline justify-content-end">
-                <div class="form-group">
-                    <label for="date" class="sr-only">Fecha:</label>
-                    <input type="date" id="date" name="date" class="form-control mr-2" 
-                           value="{{ report_date|date:'Y-m-d' }}">
-                </div>
-                <button type="submit" class="btn btn-primary">Ver Reporte</button>
-            </form>
+        <button type="submit" class="btn btn-primary">Ver Reporte</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Métricas principales -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card bg-primary text-white shadow">
+        <div class="card-body text-center">
+          <h3 class="card-title">{{ total_revenue|floatformat:0 }}</h3>
+          <p class="card-text">💰 Revenue Total</p>
         </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-success text-white shadow">
+        <div class="card-body text-center">
+          <h3 class="card-title">{{ total_orders }}</h3>
+          <p class="card-text">📋 Count of orders</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-info text-white shadow">
+        <div class="card-body text-center">
+          <h3 class="card-title">{{ average_per_order|floatformat:0 }}</h3>
+          <p class="card-text">💸 Average per Order</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Productos más vendidos -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0">🏆 Product most sale</h5>
+        </div>
+        <div class="card-body">
+          {% if most_sold_products %}
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product_name, data in most_sold_products %}
+              <tr>
+                <td>{{ product_name }}</td>
+                <td><span class="badge badge-primary">{{ data.total_quantity }}</span></td>
+                <td>${{ data.total_sales|floatformat:0 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+            <p class="text-muted">dont have any product for time period.</p>
+          {% endif %}
+        </div>
+      </div>
     </div>
 
-    <!-- Métricas principales -->
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card bg-primary text-white shadow">
-                <div class="card-body text-center">
-                    <h3 class="card-title">{{ total_revenue|floatformat:0 }}</h3>
-                    <p class="card-text">💰 Revenue Total</p>
-                </div>
-            </div>
+    <!-- Métodos de pago (con # de órdenes) -->
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">💳 form of payment</h5>
         </div>
-        <div class="col-md-4">
-            <div class="card bg-success text-white shadow">
-                <div class="card-body text-center">
-                    <h3 class="card-title">{{ total_orders }}</h3>
-                    <p class="card-text">📋 Count of orders</p>
-                </div>
-            </div>
+        <div class="card-body">
+          {% if payment_methods %}
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Payment Method</th>
+                <th>Orders</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for method, data in payment_methods %}
+              <tr>
+                <td>
+                  {% if method == "Cash" %}💵 Cash
+                  {% elif method == "Transfer" %}🏦 Transfer
+                  {% else %}{{ method }}{% endif %}
+                </td>
+                <td><span class="badge badge-success">{{ data.count }}</span></td>
+                <td>${{ data.total_amount|floatformat:0 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+            <p class="text-muted">dont have any transactions about time period</p>
+          {% endif %}
         </div>
-        <div class="col-md-4">
-            <div class="card bg-info text-white shadow">
-                <div class="card-body text-center">
-                    <h3 class="card-title">{{ average_per_order|floatformat:0 }}</h3>
-                    <p class="card-text">💸 Average per Order</p>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Productos más vendidos -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">🏆 Product most sale</h5>
-                </div>
-                <div class="card-body">
-                    {% if most_sold_products %}
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Quantity</th>
-                                    <th>Sales</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for product_name, data in most_sold_products %}
-                                <tr>
-                                    <td>{{ product_name }}</td>
-                                    <td><span class="badge badge-primary">{{ data.total_quantity }}</span></td>
-                                    <td>${{ data.total_sales|floatformat:0 }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p class="text-muted">dont have any product for time period.</p>
-                    {% endif %}
-                </div>
-            </div>
+  <!-- Detalle de órdenes del día -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+          <h5 class="mb-0">📝 details about daily orders</h5>
         </div>
-
-        <!-- Métodos de pago -->
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">💳 form of payment</h5>
-                </div>
-                <div class="card-body">
-                    {% if payment_methods %}
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Payment Method</th>
-                                    <th>Orders</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for method, data in payment_methods %}
-                                <tr>
-                                    <td>
-                                        {% if method == "Cash" %}
-                                            💵 Cash
-                                        {% elif method == "Transfer" %}
-                                            🏦 Transfer
-                                        {% else %}
-                                            {{ method }}
-                                        {% endif %}
-                                    </td>
-                                    <td><span class="badge badge-success">{{ data.count }}</span></td>
-                                    <td>${{ data.total_amount|floatformat:0 }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p class="text-muted">dont have any transactions about time period</p>
-                    {% endif %}
-                </div>
-            </div>
+        <div class="card-body">
+          {% if daily_orders %}
+          <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+              <tr>
+                <th>hour</th>
+                <th>Payment Method</th>
+                <th>Products</th>
+                <th class="text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in daily_orders %}
+              <tr>
+                <td>{{ order.date|date:"H:i" }}</td>
+                <td>
+                  {% if order.paymentMethod == "Cash" %}
+                    <span class="badge badge-success">💵 Cash</span>
+                  {% elif order.paymentMethod == "Transfer" %}
+                    <span class="badge badge-info">🏦 Transfer</span>
+                  {% else %}
+                    <span class="badge badge-secondary">{{ order.paymentMethod }}</span>
+                  {% endif %}
+                </td>
+                <td>{{ order.products|linebreaksbr }}</td>
+                <td class="text-right font-weight-bold">${{ order.total_amount|floatformat:0 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="text-center py-4">
+            <p class="text-muted">📋 dont have any orders for this date.</p>
+            <small>select other time or check that there are registered sales.</small>
+          </div>
+          {% endif %}
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Detalle de órdenes del día -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">📝 details about daily orders</h5>
-                </div>
-                <div class="card-body">
-                    {% if daily_orders %}
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>hour</th>
-                                    <th>Payment Method</th>
-                                    <th>Products</th>
-                                    <th class="text-right">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for order in daily_orders %}
-                                <tr>
-                                    <td>{{ order.date|date:"H:i" }}</td>
-                                    <td>
-                                        {% if order.paymentMethod == "Cash" %}
-                                            <span class="badge badge-success">💵 Cash</span>
-                                        {% elif order.paymentMethod == "Transfer" %}
-                                            <span class="badge badge-info">🏦 Transfer</span>
-                                        {% else %}
-                                            <span class="badge badge-secondary">{{ order.paymentMethod }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ order.products|linebreaksbr }}</td>
-                                    <td class="text-right font-weight-bold">${{ order.total_amount|floatformat:0 }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <div class="text-center py-4">
-                            <p class="text-muted">📋 dont have any orders for this date.</p>
-                            <small> select other time or check that there are registered sales.</small>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+  <!-- Botones -->
+  <div class="row mt-4">
+    <div class="col-12 text-center">
+      <a href="{% url 'orders' %}" class="btn btn-outline-primary mr-2">← Back to Sales</a>
+      <button onclick="window.print()" class="btn btn-outline-secondary">🖨️ Print Report</button>
     </div>
-
-    <!-- Botones de acción -->
-    <div class="row mt-4">
-        <div class="col-12 text-center">
-            <a href="{% url 'orders' %}" class="btn btn-outline-primary mr-2">
-                ← Back to Sales
-            </a>
-            <button onclick="window.print()" class="btn btn-outline-secondary">
-                🖨️ Print Report
-            </button>
-        </div>
-    </div>
+  </div>
 </div>
 
-<!-- Estilos para impresión -->
 <style>
 @media print {
-    .btn, .form-group, .form-inline {
-        display: none !important;
-    }
-    .container {
-        max-width: 100% !important;
-    }
+  .btn, .form-group, .form-inline { display: none !important; }
+  .container { max-width: 100% !important; }
 }
 </style>
 {% endblock %}
