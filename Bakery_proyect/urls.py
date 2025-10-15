@@ -28,7 +28,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('',viewsCore.landingPage),
-    path('adminbaneton',viewsCore.landingPageAdmin),
+    path('adminbaneton/',viewsCore.landingPageAdmin),
     path('about/', viewsCore.about, name='about'),
     path("", include("pos.urls")),
     path('admin/', admin.site.urls),
