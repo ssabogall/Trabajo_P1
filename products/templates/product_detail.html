@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block content %}
+{% load static %}
+
+<section class="py-5">
+    <div class="container px-4 px-lg-5">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'products_home' %}">Productos</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+            </ol>
+        </nav>
+
+        <div class="row gx-4 gx-lg-5 align-items-center">
+            <!-- Imagen del producto -->
+            <div class="col-md-6 mb-4 mb-md-0">
+                <div class="product-image-container">
+                    <img class="card-img-top img-fluid rounded shadow" 
+                         src="{{ product.picture.url }}" 
+                         alt="{{ product.name }}">
+                </div>
+            </div>
+
+            <!-- Información del producto -->
+            <div class="col-md-6">
+                <h1 class="display-5 fw-bolder mb-3">{{ product.name }}</h1>
+                
+                <!-- Precio -->
+                <div class="fs-2 mb-4">
+                    <span class="text-primary fw-bold">${{ product.price }}</span>
+                </div>
+
+                <!-- Disponibilidad -->
+                <div class="mb-4">
+                    {% if product.quantity > 0 %}
+                        <span class="badge bg-success fs-6">
+                            <i class="fas fa-check-circle me-1"></i>
+                            Disponible ({{ product.quantity }} unidades)
+                        </span>
+                    {% else %}
+                        <span class="badge bg-danger fs-6">
+                            <i class="fas fa-times-circle me-1"></i>
+                            Agotado
+                        </span>
+                    {% endif %}
+                </div>
+
+                <!-- Descripción -->
+                {% if product.description %}
+                <div class="mb-4">
+                    <h5 class="fw-bold">Descripción</h5>
+                    <p class="lead">{{ product.description }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Materias primas / Ingredientes -->
+                {% if product.raw_materials.exists %}
+                <div class="mb-4">
+                    <h5 class="fw-bold">Ingredientes</h5>
+                    <ul class="list-group list-group-flush">
+                        {% for raw_material in product.raw_materials.all %}
+                        <li class="list-group-item">
+                            <i class="fas fa-leaf text-success me-2"></i>
+                            {{ raw_material.name }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <!-- Botones de acción -->
+                <div class="d-flex gap-2 mb-3">
+                    {% if product.quantity > 0 %}
+                    <button 
+                        class="btn btn-primary btn-lg flex-fill add-to-cart-btn"
+                        data-name="{{ product.name }}"
+                        data-price="{{ product.price }}"
+                        data-id="{{ product.id }}"
+                    >
+                        <i class="fas fa-cart-plus me-2"></i>Agregar al carrito
+                    </button>
+                    {% else %}
+                    <button class="btn btn-secondary btn-lg flex-fill" disabled>
+                        <i class="fas fa-ban me-2"></i>No disponible
+                    </button>
+                    {% endif %}
+                </div>
+
+                <a href="{% url 'products_home' %}" class="btn btn-outline-dark btn-lg w-100">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a productos
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sección adicional de características -->
+<section class="py-5 bg-light">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5">
+            <div class="col-md-4 mb-3">
+                <div class="text-center">
+                    <i class="fas fa-bread-slice fa-3x text-primary mb-3"></i>
+                    <h5>Producto Fresco</h5>
+                    <p class="text-muted">Elaborado diariamente con ingredientes de calidad</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="text-center">
+                    <i class="fas fa-truck fa-3x text-primary mb-3"></i>
+                    <h5>Entrega Rápida</h5>
+                    <p class="text-muted">Recibe tu pedido en el menor tiempo posible</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="text-center">
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                    <h5>Garantía de Calidad</h5>
+                    <p class="text-muted">Productos con los más altos estándares</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<br>
+<div class="container my-4">
+    <h4 class="mb-4">Comentarios</h4>
+    {% for comment in comments %}
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="card-title mb-0">
+                    <i class="bi bi-person-circle me-1"></i>
+                    {{ comment.name }}
+                </h6>
+                <small class="text-muted">
+                    {{ comment.created_at }}
+                </small>
+            </div>
+            <p class="card-text mb-0">{{ comment.text }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<br>
+<br>
+<br>
+<br>
+<div class="d-flex justify-content-center">
+  <div class="card mb-4 w-100" style="max-width: 500px;">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Deja tu opinión</h5>
+      <form method="post" action="{% url 'add_comment' product.id %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="name" class="form-label">Nombre</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="name" 
+            name="name" 
+            placeholder="Tu nombre" 
+            required
+            maxlength="100"
+          >
+        </div>
+        <div class="mb-3">
+          <label for="comment" class="form-label">Comentario</label>
+          <textarea 
+            class="form-control" 
+            id="comment" 
+            name="comment" 
+            rows="4" 
+            placeholder="Escribe tu comentario aquí..." 
+            required
+          ></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-paper-plane me-2"></i>Enviar comentario
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
+<style>
+.product-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+}
+
+.product-image-container img {
+    transition: transform 0.3s ease;
+}
+
+.product-image-container:hover img {
+    transform: scale(1.05);
+}
+
+.breadcrumb {
+    background-color: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item a {
+    text-decoration: none;
+    color: #6c757d;
+}
+
+.breadcrumb-item a:hover {
+    color: #0d6efd;
+}
+</style>
+
+<script src="{% static 'products/js/scriptProducts.js' %}"></script>
+
+{% endblock %}

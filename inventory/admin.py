@@ -1,28 +1,16 @@
 from django.contrib import admin
+from .models import RawMaterial, Product, ProductRawMaterial, Order, OrderItem, Customer,Comment
+# Register your models here.
 
-from .models import (
-    RawMaterial,
-    ProductRawMaterial,
-    Order,
-    OrderItem,
-    Customer,
-    Promotion,
-)
-
-# Product vive en la app products
-from products.models import Product
 
 admin.site.register(RawMaterial)
-admin.site.register(Product)             # opcional, registrar también en products/admin.py
+admin.site.register(Product)
 admin.site.register(ProductRawMaterial)
 admin.site.register(Order)
 admin.site.register(OrderItem)
 admin.site.register(Customer)
+admin.site.register(Comment)
 
-@admin.register(Promotion)
-class PromotionAdmin(admin.ModelAdmin):
-    list_display = (
-        "name", "scope", "discount_type", "value",
-        "is_active", "starts_at", "ends_at",
-    )
-    filter_horizontal = ("products", "categories")
+# [[AGREGADO]] Registrar modelo Promotion en el admin
+from .models import Promotion
+admin.site.register(Promotion)

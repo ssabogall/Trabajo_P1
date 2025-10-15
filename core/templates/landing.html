@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div id="banetonCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="{% static 'images/pan1.jpg' %}" class="d-block w-100" alt="Pan artesanal">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                <h1 class="display-4 fw-bold text-white text-center">Tradición que alimenta el alma</h1>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="{% static 'images/san1.jpg' %}" class="d-block w-100" alt="Sánduches Banetón">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                <h1 class="display-4 fw-bold text-white text-center">Pan fresco, sabor artesanal</h1>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="{% static 'images/pan3.jpg' %}" class="d-block w-100" alt="Masa madre Banetón">
+            <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                <h1 class="display-4 fw-bold text-white text-center">Hecho con masa madre y pasión</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flechas de navegación -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#banetonCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true" style="filter: invert(100%);"></span>
+        <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#banetonCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true" style="filter: invert(100%);"></span>
+        <span class="visually-hidden">Siguiente</span>
+    </button>
+</div>
+
+<section id="productos" class="container text-center py-5">
+    <h2 class="mb-4" style="font-family: 'Poppins', sans-serif; color:#4b3d2a;">Nuestros Productos</h2>
+    <p style="color:#6b4f3b;">Pan artesanal, sánduches frescos y repostería elaborada con amor.</p>
+</section>
+
+
+{% endblock %}

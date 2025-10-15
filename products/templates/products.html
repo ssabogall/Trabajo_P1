@@ -1,207 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <title>Banetón</title>
+{% load promo_tags %}
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
 
-  <!-- Core CSS -->
-  <link href="{% static 'inventory/css/styles.css' %}" rel="stylesheet" />
-  <link href="{% static 'products/css/styles.css' %}" rel="stylesheet" />
-
-  <!-- Fonts & Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-</head>
-<body>
-
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container">
-      <a href="/" id="navbar__logo">
-        <img src="{% static 'images/baneton.png' %}" alt="LOGO">
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link" href="#intro">Información</a></li>
-          <li class="nav-item"><a class="nav-link" href="#footer">Contacto</a></li>
-          <li class="nav-item navbar__btn">
-            <div class="nav-item button" id="cart-icon">
-              <i class="fa-solid fa-bread-slice"></i>
-              <span class="cart-badge" id="cart-badge">0</span>
-            </div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Carrito -->
-  <div class="cart-dropdown" id="cart-dropdown">
-    <div class="cart-dropdown-header">
-      <h5>Mi Carrito</h5>
-      <button class="cart-close" id="cart-close"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="cart-dropdown-body" id="cart-body">
-      <div class="cart-empty" id="cart-empty">
-        <i class="fas fa-shopping-cart"></i>
-        <p>Tu carrito está vacío</p>
-      </div>
-    </div>
-    <div class="cart-dropdown-footer" id="cart-footer" style="display: none;">
-      <div class="cart-total">Total: $<span id="cart-total">0.00</span></div>
-      <div class="cart-actions">
-        <button class="btn-clear" id="clear-cart">Limpiar</button>
-        <a class="btn-checkout" id="checkout-cart" href="{% url 'products_forms' %}">Comprar</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filtros -->
-  <section class="py-3">
+<!-- [[MODIFICADO]] Buscador + filtros -->
+<section class="py-3">
     <div class="container px-4 px-lg-5">
-      <form method="get" class="row g-3" role="search">
-        <!-- Texto -->
-        <div class="col-12 col-md-4">
-          <label class="form-label mb-1">Buscar</label>
-          <input class="form-control" type="search" name="q"
-                 placeholder="Buscar productos..." value="{{ selected.q|default:q }}">
+    <form method="get" class="row g-2 align-items-end" role="search">
+        <div class="col-md-4">
+            <label class="form-label mb-0">Buscar</label>
+            <input class="form-control" type="search" name="q" placeholder="Buscar productos..." value="{{ q }}">
         </div>
-
-        <!-- Precio -->
-        <div class="col-6 col-md-2">
-          <label class="form-label mb-1">Precio mín</label>
-          <input class="form-control" type="number" step="0.01" name="price_min"
-                 value="{{ selected.pmin|default:'' }}">
+        <div class="col-md-2">
+            <label class="form-label mb-0">Precio mín</label>
+            <input class="form-control" type="number" name="min_price" min="0" step="1" value="{{ min_price }}">
         </div>
-        <div class="col-6 col-md-2">
-          <label class="form-label mb-1">Precio máx</label>
-          <input class="form-control" type="number" step="0.01" name="price_max"
-                 value="{{ selected.pmax|default:'' }}">
+        <div class="col-md-2">
+            <label class="form-label mb-0">Precio máx</label>
+            <input class="form-control" type="number" name="max_price" min="0" step="1" value="{{ max_price }}">
         </div>
-
-        <!-- Promoción -->
-        <div class="col-12 col-md-4 d-flex align-items-end">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="promotion" value="1"
-                   id="promo" {% if selected.promo == '1' %}checked{% endif %}>
-            <label class="form-check-label" for="promo">Solo en promoción</label>
-          </div>
+        <div class="col-md-3">
+            <label class="form-label mb-0">Orden</label>
+            <select class="form-select" name="order">
+                <option value="name_az" {% if order == 'name_az' %}selected{% endif %}>Nombre A→Z</option>
+                <option value="price_asc" {% if order == 'price_asc' %}selected{% endif %}>Precio: menor→mayor</option>
+                <option value="price_desc" {% if order == 'price_desc' %}selected{% endif %}>Precio: mayor→menor</option>
+            </select>
         </div>
-
-        <!-- Tipo: desplegable simple -->
-        <div class="col-12 col-md-6">
-          <label class="form-label mb-1">Tipo</label>
-          <select class="form-select" name="type">
-            <option value="" {% if not selected.type %}selected{% endif %}>Todos</option>
-            <option value="sanduche"   {% if selected.type == 'sanduche' %}selected{% endif %}>Sanduche</option>
-            <option value="pan_tajada" {% if selected.type == 'pan_tajada' %}selected{% endif %}>Pan tajada</option>
-            <option value="otro"       {% if selected.type == 'otro' %}selected{% endif %}>Otro</option>
-          </select>
+        <div class="col-md-1 form-check mt-4">
+            <input class="form-check-input" type="checkbox" id="onlyPromo" name="only_promo" value="1" {% if only_promo %}checked{% endif %}>
+            <label class="form-check-label" for="onlyPromo">Solo en promoción</label>
         </div>
-
-        <!-- Orden -->
-        <div class="col-12 col-md-6">
-          <label class="form-label mb-1">Orden</label>
-          <select class="form-select" name="order">
-            <option value="name"   {% if selected.order == 'name' %}selected{% endif %}>Nombre A→Z</option>
-            <option value="-price" {% if selected.order == '-price' %}selected{% endif %}>Precio ↓</option>
-            <option value="price"  {% if selected.order == 'price' %}selected{% endif %}>Precio ↑</option>
-          </select>
+        <div class="col-12">
+            <button class="btn btn-outline-dark me-2" type="submit">Filtrar</button><a class="btn btn-secondary" href="{% url 'products_home' %}">Limpiar</a>
         </div>
-
-        <!-- Acciones -->
-        <div class="col-12 d-flex gap-2">
-          <button class="btn btn-dark" type="submit">
-            <i class="fa-solid fa-filter me-1"></i> Filtrar
-          </button>
-          <a class="btn btn-outline-secondary" href="{% url 'product_list' %}">
-            Limpiar
-          </a>
-        </div>
-
-        {% if selected.q %}
-          <div class="col-12">
-            <small class="text-muted">
-              Resultados para "<strong>{{ selected.q }}</strong>": {{ results_count }}
-            </small>
-          </div>
-        {% endif %}
-      </form>
+    </form>
+    {% if q %}
+        <small class="text-muted d-block mt-2">
+        Resultados para "<strong>{{ q }}</strong>": {{ results_count }}
+        </small>
+    {% endif %}
     </div>
-  </section>
+</section>
 
-  {% if products %}
+{% if products %}
     <section class="py-5">
-      <div class="container px-4 px-lg-5 mt-5">
+    <div class="container px-4 px-lg-5 mt-5">
         <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-          {% for product in products %}
-            <div class="col mb-5">
-              <div class="card h-100">
-                {% if product.picture %}
-                  <img class="card-img-top" src="{{ product.picture.url }}" alt="{{ product.name }}">
-                {% else %}
-                  <img class="card-img-top" src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}">
-                {% endif %}
-                <div class="card-body p-4">
-                  <div class="text-center">
-                    <h5 class="fw-bolder">{{ product.name }}</h5>
-
-                    {# === PRECIO CON PROMOCIÓN === #}
-                    {% if product.final_price and product.price and product.final_price < product.price %}
-                      <div class="mb-1">
-                        <span class="text-muted text-decoration-line-through">
-                          ${{ product.price }}
-                        </span>
-                        <strong class="ms-1">
-                          ${{ product.final_price }}
-                        </strong>
-                      </div>
-                    {% else %}
-                      {% if product.price %}
-                        <div class="mb-1">
-                          <strong>${{ product.price }}</strong>
+{% for product in products %}
+                    <div class="col mb-5">
+                        <div class="card h-100">
+                            <img class="card-img-top" src="{{ product.picture.url }}" alt="{{ product.name }}">
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <a href="{% url 'product_detail' product.id %}" class="product-link">
+                                        <h5 class="fw-bolder">{{ product.name }}</h5>
+                                    </a>
+                                    {% if product|has_promo %}<span class="text-muted text-decoration-line-through">${{ product.price }}</span> <span class="fw-bold">${{ product|effective_price }}</span>{% else %}${{ product.price }}{% endif %}
+                                        {% if product|has_promo %}<div><span class="badge bg-warning text-dark mt-2">Promo</span></div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center">
+                                    <button 
+                                        class="btn btn-outline-dark mt-auto add-to-cart-btn"
+                                        data-name="{{ product.name }}"
+                                        data-price="{{ product|effective_price }}"
+                                        data-id="{{ product.id }}"
+                                    >
+                                        <i class="fas fa-cart-plus me-1"></i>Agregar
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                      {% endif %}
-                    {% endif %}
-
-                    {% if product.promotion %}
-                      <span class="badge bg-warning text-dark ms-1">Promo</span>
-                    {% endif %}
-                  </div>
-                </div>
-                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                  <div class="text-center">
-                    <button
-                      class="btn btn-outline-dark mt-auto add-to-cart-btn"
-                      data-name="{{ product.name }}"
-                      data-price="{{ product.final_price|default:product.price }}"
-                      data-id="{{ product.id }}"
-                    >
-                      <i class="fas fa-cart-plus me-1"></i>Agregar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          {% endfor %}
+                    </div>
+                {% endfor %}
         </div>
-      </div>
-    </section>
-  {% else %}
-    <div class="container px-4 px-lg-5">
-      <p>No hay productos disponibles.</p>
     </div>
-  {% endif %}
+    </section>
+{% else %}
+    <p>No hay productos disponibles.</p>
+{% endif %}
 
-  <script src="{% static 'products/js/scriptProducts.js' %}"></script>
-</body>
-</html>
+
+    <script src="{% static 'products/js/scriptProducts.js' %}"></script>
+{% endblock %}

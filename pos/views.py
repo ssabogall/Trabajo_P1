@@ -1,217 +1,120 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.core.exceptions import MultipleObjectsReturned
 from django.contrib.admin.views.decorators import staff_member_required
 
 from django.utils import timezone
-from django.db.models import Sum, Count, F, DecimalField, Value, ExpressionWrapper, DateTimeField
+from django.utils.dateparse import parse_datetime
+
+from django.db.models import Sum, Count, F, DecimalField, Value, ExpressionWrapper, DateTimeField, DateField
 from django.db.models.functions import Coalesce, TruncDate
 
 from datetime import date, datetime
 from decimal import Decimal
 import json
-from collections import defaultdict
 
 # Models
-from products.models import Product
-from inventory.models import Order, OrderItem
+from inventory.models import Product, Order, OrderItem
+# Customer es opcional: si tu app lo tiene, lo usaremos al guardar una orden
 try:
-    from inventory.models import Customer
+    from inventory.models import Customer  # del primer código
     HAS_CUSTOMER = True
 except Exception:
     HAS_CUSTOMER = False
 
-# Descuentos/Promos
-from inventory.services.discounts import best_product_unit_price, price_cart
 
 # -------------------------------
-# Helpers
+# Utilidades comunes / agregados
 # -------------------------------
 MONEY = DecimalField(max_digits=12, decimal_places=2)
-REVENUE_EXPR = ExpressionWrapper(
-    (Coalesce(F("unit_price"), F("product__price"))) * F("quantity"),
-    output_field=MONEY,
-)
+REVENUE_EXPR = ExpressionWrapper(F("unit_price") * F("quantity"), output_field=MONEY)
+# [[MODIFICADO]] Antes se multiplicaba product__price * quantity; ahora unit_price * quantity
 
 def _sum_money(qs):
+    """Suma de ingresos: precio actual del producto * cantidad."""
     return qs.aggregate(
         total=Coalesce(Sum(REVENUE_EXPR, output_field=MONEY), Value(Decimal("0.00")), output_field=MONEY)
     )["total"] or Decimal("0.00")
 
 
 # -------------------------------
-# POS UI
+# Vistas comunes de POS / Órdenes
 # -------------------------------
 def pos(request):
-    products = list(Product.objects.all())
-    for p in products:
-        eff, _, _ = best_product_unit_price(p, qty=1)
-        setattr(p, "final_price", eff)
+    products = Product.objects.all()
     return render(request, "pos.html", {"products": products})
 
 
 def orders(request):
-    """
-    Lista las órdenes mostrando:
-      - Fecha/hora (usa __str__ de Order)
-      - Método de pago
-      - Productos (uno por línea: 'Nombre xCantidad')
-      - Total (suma line_total o, si falta, unit_price*qty o price*qty)
-      - Cliente (template ya muestra nombre y cédula)
-    """
-    orders_qs = (
-        Order.objects
-        .select_related("customer")
-        .prefetch_related("orderitem_set__product")
-        .order_by("-date")
-    )
-
-    # Inyectar 'products' y 'total_amount' a cada Order
-    for o in orders_qs:
-        items = list(o.orderitem_set.all())
-
-        total = Decimal("0.00")
-        lines = []
-        for it in items:
-            if it.line_total and it.line_total != Decimal("0.00"):
-                line_total = it.line_total
-            elif it.unit_price and it.unit_price != Decimal("0.00"):
-                line_total = it.unit_price * it.quantity
-            else:
-                line_total = Decimal(getattr(it.product, "price", 0)) * it.quantity
-
-            total += line_total
-            pname = getattr(it.product, "name", str(it.product))
-            lines.append(f"{pname} x{it.quantity}")
-
-        setattr(o, "products", "\n".join(lines))
-        setattr(o, "total_amount", total)
-
-    return render(request, "orders.html", {"orders": orders_qs})
+    orders_qs = Order.objects.all()
+    items = OrderItem.objects.all()
+    return render(request, "orders.html", {"orders": orders_qs, "items": items})
 
 
-# -------------------------------
-# Guardar orden (POS)
-# -------------------------------
-@csrf_exempt   # en producción usar CSRF correctamente
+
+@csrf_exempt  
 @require_POST
 def save_order(request):
-    """
-    Espera JSON:
-    {
-      "orders": [{"id": <product_id>, "quantity": <int>}, ...],
-      "paymentMethod": "Cash" | "Card" | "Transfer",
-      "customer": {"cedula": "...", "nombre"/"firstName": "...", "correo": "..."}
-    }
-    """
     try:
-        data = json.loads(request.body or "{}")
+        data = json.loads(request.body)
     except json.JSONDecodeError:
         return JsonResponse({"status": "error", "message": "JSON inválido"}, status=400)
 
-    raw_items = data.get("orders") or []
-    if not raw_items:
-        return JsonResponse({"status": "error", "message": "No hay items en la orden"}, status=400)
+    orders = data.get("orders")
+    if not orders:
+        return JsonResponse({"status": "error", "message": "No hay productos en la orden"}, status=400)
 
-    # 1) Normalizar cantidades por producto (acumular si vienen repetidos)
-    qty_map = defaultdict(int)
-    for it in raw_items:
-        try:
-            pid = int(it.get("id"))
-            q = int(it.get("quantity", 1))
-        except (TypeError, ValueError):
-            continue
-        if pid and q > 0:
-            qty_map[pid] += q
+    payment_method = data.get("paymentMethod", "Cash")
+    customer_data = data.get("customer", {})
 
-    if not qty_map:
-        return JsonResponse({"status": "error", "message": "Carrito vacío"}, status=400)
-
-    # 2) Cliente y método de pago
-    payment_method = (data.get("paymentMethod") or "Cash").strip() or "Cash"
-
+    # Crear cliente si se envió alguno
     customer_obj = None
-    if HAS_CUSTOMER:
-        cust = data.get("customer") or {}
-        cedula = (cust.get("cedula") or "").strip()
-        nombre = (cust.get("nombre") or cust.get("firstName") or "").strip()
-        correo = (cust.get("correo") or "").strip()
-        if cedula or nombre or correo:
-            customer_obj = Customer.objects.create(
-                cedula=cedula, nombre=nombre, correo=correo
-            )
+    if HAS_CUSTOMER and (customer_data.get("cedula") or customer_data.get("nombre") or customer_data.get("correo")):
+        customer_obj = Customer.objects.create(
+            cedula=customer_data.get("cedula", ""),
+            nombre=customer_data.get("nombre", ""),
+            correo=customer_data.get("correo", ""),
+        )
 
-    # 3) Orden
+    # Crear la orden
     order = Order.objects.create(
         paymentMethod=payment_method,
-        **({"customer": customer_obj} if customer_obj else {})
+        customer=customer_obj if HAS_CUSTOMER else None
     )
 
-    # 4) Valorar carrito con promos
-    products_map = {p.id: p for p in Product.objects.filter(id__in=qty_map.keys())}
-    cart = [{"product": products_map[pid], "qty": qty} for pid, qty in qty_map.items() if pid in products_map]
+    # Crear OrderItems respetando cantidades
+    for item in orders:
+        pid = item.get("id")
+        qty = int(item.get("quantity", 1))
 
-    detailed, order_disc, totals = price_cart(cart, order_level_promos=True)
+        try:
+            product = Product.objects.get(id=pid)
+        except Product.DoesNotExist:
+            continue  # Ignora productos inválidos
 
-    # Fallback por si no llega 'totals' completo
-    if not totals or any(k not in totals for k in ("subtotal", "discount_total", "total")):
-        subtotal = Decimal("0.00")
-        discount_total = Decimal("0.00")
-        total = Decimal("0.00")
-        detailed = []
-        for pid, qty in qty_map.items():
-            prod = products_map.get(pid)
-            if not prod:
-                continue
-            unit, disc_unit, _ = best_product_unit_price(prod, qty=qty)
-            line_sub = Decimal(prod.price) * qty
-            line_tot = Decimal(unit) * qty
-            line_disc = line_sub - line_tot
-            subtotal += line_sub
-            discount_total += line_disc
-            total += line_tot
-            detailed.append({
-                "product": prod, "qty": qty, "unit_price": unit,
-                "line_subtotal": line_sub, "line_discount": line_disc, "line_total": line_tot
-            })
-        totals = {"subtotal": subtotal, "discount_total": discount_total, "total": total}
-
-    # 5) Guardar líneas
-    items_to_create = []
-    for d in detailed:
-        items_to_create.append(OrderItem(
+        OrderItem.objects.create(
             order=order,
-            product=d["product"],
-            quantity=int(d["qty"]),
-            unit_price=Decimal(d["unit_price"]),
-            line_subtotal=Decimal(d["line_subtotal"]),
-            line_discount=Decimal(d["line_discount"]),
-            line_total=Decimal(d["line_total"]),
-        ))
-    OrderItem.objects.bulk_create(items_to_create)
+            product=product,
+            quantity=qty
+        )
 
-    # 6) Guardar totales en la orden
-    order.subtotal = Decimal(totals["subtotal"])
-    order.discount_total = Decimal(totals["discount_total"])
-    order.total = Decimal(totals["total"])
-    order.save(update_fields=["subtotal", "discount_total", "total"])
+    return JsonResponse({"status": "success", "order_id": order.id})
 
-    return JsonResponse({
-        "status": "success",
-        "order_id": order.id,
-        "totals": {
-            "subtotal": str(order.subtotal),
-            "discount_total": str(order.discount_total),
-            "total": str(order.total),
-        }
-    })
+
+
 
 
 # ---------------------------------
-# Reporte diario
+# Reporte diario (PB-02 consolidado)
 # ---------------------------------
 def daily_sales_report(request):
+    """
+    Reporte diario de ventas (PB-02), compatible con DateField y DateTimeField.
+    No depende de métodos del modelo; calcula todo vía agregaciones.
+    """
+    # Fecha solicitada o hoy
     report_date_param = request.GET.get("date")
     if report_date_param:
         try:
@@ -221,24 +124,25 @@ def daily_sales_report(request):
     else:
         report_date = date.today()
 
+    # Detectar tipo del campo Order.date
     date_field = Order._meta.get_field("date")
     tz = timezone.get_current_timezone()
 
-    # Filtrar órdenes e ítems del día
     if isinstance(date_field, DateTimeField):
         start_day = timezone.make_aware(datetime.combine(report_date, datetime.min.time()), tz)
         end_day = start_day + timezone.timedelta(days=1)
         orders_day = Order.objects.filter(date__gte=start_day, date__lt=end_day)
         items_day = OrderItem.objects.filter(order__in=orders_day)
-    else:
+        trunc_date_expr = TruncDate("order__date", tzinfo=tz)
+    else:  # DateField
         orders_day = Order.objects.filter(date=report_date)
         items_day = OrderItem.objects.filter(order__in=orders_day)
+        trunc_date_expr = TruncDate("order__date")
 
-    # Métricas agregadas
     total_orders = orders_day.count()
     total_revenue = _sum_money(items_day)
 
-    # Top productos (cantidad y ventas)
+    # Productos más vendidos (top 5)
     top_products_qs = (
         items_day.values("product__name")
         .annotate(
@@ -247,6 +151,7 @@ def daily_sales_report(request):
         )
         .order_by("-total_quantity")[:5]
     )
+    # Transformar a lista de tuplas como en el primer código
     most_sold_products = [
         (
             r["product__name"],
@@ -255,7 +160,7 @@ def daily_sales_report(request):
         for r in top_products_qs
     ]
 
-    # Métodos de pago: total y conteo de órdenes
+    # Ventas por método de pago (se suma por OrderItem usando REVENUE_EXPR)
     pay_qs = (
         items_day.values("order__paymentMethod")
         .annotate(
@@ -264,33 +169,7 @@ def daily_sales_report(request):
         )
         .order_by("-total_amount")
     )
-    payment_methods = [
-        (r["order__paymentMethod"] or "N/D", {"count": r["count"], "total_amount": r["total_amount"]})
-        for r in pay_qs
-    ]
-
-    # ---- Enriquecer órdenes del día con productos y total ----
-    # Mapa: order_id -> "Nombre xCantidad\n..."
-    product_lines = defaultdict(list)
-    for it in items_day.select_related("product"):
-        pname = getattr(it.product, "name", str(it.product))
-        product_lines[it.order_id].append(f"{pname} x{it.quantity}")
-
-    # Mapa: order_id -> total
-    totals_by_order = {
-        r["order_id"]: r["total"]
-        for r in items_day.values("order_id").annotate(
-            total=Coalesce(Sum(REVENUE_EXPR, output_field=MONEY), Value(Decimal("0.00")), output_field=MONEY)
-        )
-    }
-
-    # Prefetch para mostrar cliente en otras pantallas si se requiere
-    orders_day = orders_day.select_related("customer").order_by("date")
-
-    # Inyectar atributos usados por la plantilla
-    for o in orders_day:
-        setattr(o, "products", "\n".join(product_lines.get(o.id, [])))
-        setattr(o, "total_amount", totals_by_order.get(o.id, Decimal("0.00")))
+    payment_methods = [(r["order__paymentMethod"] or "N/D", {"count": r["count"], "total_amount": r["total_amount"]}) for r in pay_qs]
 
     average_per_order = (total_revenue / total_orders) if total_orders else Decimal("0.00")
 
@@ -300,14 +179,14 @@ def daily_sales_report(request):
         "total_revenue": total_revenue,
         "average_per_order": average_per_order,
         "most_sold_products": most_sold_products,
-        "payment_methods": payment_methods,
+        "payment_methods": payment_methods,  # iterable como en el primer código
         "daily_orders": orders_day,
     }
     return render(request, "daily_sales_report.html", context)
 
 
 # ---------------------------------
-# Dashboard / KPIs
+# Dashboard / KPIs (del segundo código)
 # ---------------------------------
 @staff_member_required
 def baneton_dashboard(request):
@@ -320,7 +199,9 @@ def baneton_kpis(request):
     now = timezone.localtime()
     today = timezone.localdate()
 
+    # Detectar tipo del campo Order.date
     date_field = Order._meta.get_field("date")
+
     if isinstance(date_field, DateTimeField):
         start_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
         start_tomorrow = start_today + timezone.timedelta(days=1)
@@ -331,7 +212,7 @@ def baneton_kpis(request):
         items_yesterday = OrderItem.objects.filter(order__date__gte=start_yesterday, order__date__lt=start_today)
         range_last_7 = OrderItem.objects.filter(order__date__gte=last_7_start, order__date__lt=start_tomorrow)
         trunc_for_series = TruncDate("order__date", tzinfo=tz)
-    else:
+    else:  # DateField
         yesterday = today - timezone.timedelta(days=1)
         last_7_start = today - timezone.timedelta(days=6)
 
@@ -340,9 +221,11 @@ def baneton_kpis(request):
         range_last_7 = OrderItem.objects.filter(order__date__gte=last_7_start, order__date__lte=today)
         trunc_for_series = TruncDate("order__date")
 
+    # KPIs base
     revenue_today = _sum_money(items_today)
     units_today = items_today.aggregate(units=Coalesce(Sum("quantity"), Value(0)))["units"] or 0
 
+    # Top productos (hoy)
     top_qs = (
         items_today.values("product__name")
         .annotate(total_qty=Coalesce(Sum("quantity"), Value(0)))
@@ -353,9 +236,12 @@ def baneton_kpis(request):
         "data": [int(r["total_qty"]) for r in top_qs],
     }
 
+    # Distribución por método de pago (hoy)
     pay_qs = (
         items_today.values("order__paymentMethod")
-        .annotate(amount=Coalesce(Sum(REVENUE_EXPR, output_field=MONEY), Value(Decimal("0.00")), output_field=MONEY))
+        .annotate(
+            amount=Coalesce(Sum(REVENUE_EXPR, output_field=MONEY), Value(Decimal("0.00")), output_field=MONEY)
+        )
         .order_by("-amount")
     )
     revenue_by_payment = {
@@ -363,6 +249,7 @@ def baneton_kpis(request):
         "data": [float(r["amount"]) for r in pay_qs],
     }
 
+    # Series últimos 7 días
     by_day_rev = (
         range_last_7.annotate(day=trunc_for_series)
         .values("day")
@@ -385,6 +272,7 @@ def baneton_kpis(request):
         "data": [int(d["units"]) for d in by_day_units],
     }
 
+    # Tendencia (vs ayer)
     revenue_yesterday = _sum_money(items_yesterday)
     units_yesterday = items_yesterday.aggregate(units=Coalesce(Sum("quantity"), Value(0)))["units"] or 0
 
@@ -398,6 +286,43 @@ def baneton_kpis(request):
         "units_yesterday": int(units_yesterday),
     }
 
+    # Productos en tendencia (últimos 7 días vs 7 previos)
+    prev7_start = (range_last_7.first().order.date if range_last_7.exists() else today)  # solo para evitar var no definida
+    if isinstance(date_field, DateTimeField):
+        prev7_start = last_7_start - timezone.timedelta(days=7)
+        prev7_end = last_7_start
+        prev_range = OrderItem.objects.filter(order__date__gte=prev7_start, order__date__lt=prev7_end)
+    else:  # DateField
+        prev7_start = today - timezone.timedelta(days=13)
+        prev7_end = today - timezone.timedelta(days=6)
+        prev_range = OrderItem.objects.filter(order__date__gte=prev7_start, order__date__lt=prev7_end)
+
+    if isinstance(date_field, DateTimeField):
+        prev_range = OrderItem.objects.filter(order__date__gte=prev7_start, order__date__lt=prev7_end)
+    else:
+        prev_range = OrderItem.objects.filter(order__date__gte=prev7_start, order__date__lt=prev7_end)
+
+    curr7 = range_last_7.values("product__name").annotate(q=Coalesce(Sum("quantity"), Value(0)))
+    prev7 = prev_range.values("product__name").annotate(q=Coalesce(Sum("quantity"), Value(0)))
+    c_map = {r["product__name"]: int(r["q"]) for r in curr7}
+    p_map = {r["product__name"]: int(r["q"]) for r in prev7}
+    names = set(c_map) | set(p_map)
+
+    trending = []
+    for name in names:
+        c = c_map.get(name, 0)
+        p = p_map.get(name, 0)
+        delta = c - p
+        growth = ((delta / p) * 100) if p else (None if c == 0 else 100.0)
+        trending.append({"name": name, "delta": delta, "growth": growth})
+    trending.sort(key=lambda x: x["delta"], reverse=True)
+    trending_products = {
+        "labels": [t["name"] for t in trending[:5]],
+        "delta": [t["delta"] for t in trending[:5]],
+        "growth": [t["growth"] for t in trending[:5]],
+    }
+
+    # Compat: el template usa sales_by_day
     sales_by_day = revenue_by_day
 
     return JsonResponse({
@@ -408,6 +333,6 @@ def baneton_kpis(request):
         "revenue_by_day": revenue_by_day,
         "units_by_day": units_by_day,
         "trends": trends,
-        "trending_products": {"labels": [], "delta": [], "growth": []},
+        "trending_products": trending_products,
         "sales_by_day": sales_by_day,
     })

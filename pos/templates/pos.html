@@ -1,108 +1,85 @@
 {% extends "base.html" %}
-{% load static %}
 {% block content %}
+{% load static %}
+{% load promo_tags %}
 
+<!-- Alert container -->
 <div id="alert-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
 
 <div class="container px-4 px-lg-5 mt-5">
-  <div class="row">
-    <!-- Products Column -->
-    <div class="col-md-8">
-      {% if products %}
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-          {% for product in products %}
-            <div class="col mb-5">
-              <div class="card h-100">
-                {% if product.picture %}
-                  <img class="card-img-top" src="{{ product.picture.url }}" alt="{{ product.name }}">
-                {% endif %}
-                <div class="card-body p-4">
-                  <div class="text-center">
-                    <h5 class="fw-bolder">{{ product.name }}</h5>
+    <div class="row">
+        <!-- Products Column -->
+        <div class="col-md-8">
+            {% if products %}
+                <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                    {% for product in products %}
+                        <div class="col mb-5">
+                            <div class="card h-100">
+                                <img class="card-img-top" src="{{ product.picture.url }}" alt="{{ product.name }}">
+                                <div class="card-body p-4">
+                                    <div class="text-center">
+                                        <h5 class="fw-bolder">{{ product.name }}</h5>
+                                        {% if product|has_promo %}<span class="text-muted text-decoration-line-through">${{ product.price }}</span> <span class="fw-bold">${{ product|effective_price }}</span><div><span class="badge bg-warning text-dark mt-2">Promo</span></div>{% else %}${{ product.price }}{% endif %}
+                                    </div>
+                                </div>
+                                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                    <div class="text-center">
+                                        <button 
+                                            class="btn btn-outline-dark mt-auto add-to-order-btn"
+                                            data-name="{{ product.name }}"
+                                            data-price="{{ product|effective_price }}"
+                                            data-id="{{ product.id }}"
+                                        >Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No hay productos disponibles.</p>
+            {% endif %}
+        </div>
 
-                    {# Mostrar precio con promo si aplica #}
-                    {% if product.final_price and product.price and product.final_price != product.price %}
-                      <div>
-                        <span class="text-muted text-decoration-line-through">${{ product.price }}</span>
-                        <span class="ms-2 fw-bold">${{ product.final_price }}</span>
-                        <span class="badge bg-warning text-dark ms-1">Promo</span>
-                      </div>
-                    {% else %}
-                      <div>${{ product.final_price|default:product.price }}</div>
-                    {% endif %}
-                  </div>
-                </div>
-                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                  <div class="text-center">
-                    <button
-                      class="btn btn-outline-dark mt-auto add-to-order-btn"
-                      data-id="{{ product.id }}"
-                      data-name="{{ product.name }}"
-                      data-price="{{ product.final_price|default:product.price }}"
-                    >
-                      Agregar
-                    </button>
-                  </div>
-                </div>
-              </div>
+        <!-- Order List Column -->
+        <div class="col-md-4">
+            <h3>Order List</h3>
+            <ul class="list-group" id="order-list">
+                <!-- Items will appear here -->
+            </ul>
+            <hr>
+            <h5>Total: $<span id="order-total">0.00</span></h5>
+
+            <!-- Payment Method -->
+            <div class="mt-3">
+                <label for="payment-toggle" class="form-label">Payment Method:</label>
+                <button id="payment-toggle" class="btn btn-outline-primary">Cash</button>
             </div>
-          {% endfor %}
+
+            <br>
+            <div class="mb-2">
+                <label for="cedula">Cédula</label>
+                <input type="text" id="cedula" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label for="correo">Correo</label>
+                <input type="text" id="correo" class="form-control">
+            </div>
+
+            <button class="btn btn-primary mt-3 w-100" id="checkout-btn" disabled>Checkout</button>
         </div>
-      {% else %}
-        <p>No hay productos disponibles.</p>
-      {% endif %}
     </div>
-
-    <!-- Order Column -->
-    <div class="col-md-4">
-      <h3>Order</h3>
-
-      <!-- El envío lo hace el JS con fetch; este form solo nos da estructura e inputs -->
-      <form id="pos-form">
-        {% csrf_token %}
-
-        <ul class="list-group mb-3" id="order-list">
-          <!-- Items se pintan con JS -->
-        </ul>
-
-        <div class="d-flex justify-content-between align-items-center">
-          <h5>Total: $<span id="order-total">0.00</span></h5>
-          <button type="button" class="btn btn-sm btn-outline-secondary" id="clear-order">Limpiar</button>
-        </div>
-
-        <hr>
-
-        <!-- Payment Method -->
-        <div class="mt-2">
-          <label for="payment-toggle" class="form-label">Payment Method:</label>
-          <button type="button" id="payment-toggle" class="btn btn-outline-primary">Cash</button>
-          <!-- Campo oculto opcional por si quisieras leerlo desde el DOM -->
-          <input type="hidden" id="paymentMethod" value="Cash">
-        </div>
-
-        <div class="mt-3">
-          <label class="form-label">Cédula</label>
-          <input type="text" class="form-control" id="cedula">
-
-          <label class="form-label mt-2">Nombre</label>
-          <input type="text" class="form-control" id="nombre">
-
-          <label class="form-label mt-2">Correo</label>
-          <input type="email" class="form-control" id="correo">
-        </div>
-
-        <!-- Hidden con el carrito (solo informativo; el JS envía el JSON directo) -->
-        <input type="hidden" id="orders-json" value="[]">
-
-        <!-- IMPORTANTE: button, no submit (el JS hace fetch) -->
-        <button class="btn btn-primary mt-3 w-100" id="checkout-btn" type="button" disabled>Checkout</button>
-      </form>
-    </div>
-  </div>
 </div>
+
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}
 
 {% block extra_scripts %}
-  <script src="{% static 'products/js/scriptPOS.js' %}"></script>
+<script src="{% static 'products/js/scriptPOS.js' %}"></script>
 {% endblock %}
