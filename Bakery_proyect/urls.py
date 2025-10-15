@@ -15,32 +15,28 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
 from django.urls import path, include
 
-from inventory import views as viewsInventory
-from products import views as viewsProduct
 from core import views as viewsCore
-from pos import views as viewsPOS
 
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('',viewsCore.landingPage),
-    path('adminbaneton',viewsCore.landingPageAdmin),
+    # Core pages
+    path('', viewsCore.landingPage, name='landing'),
+    path('adminbaneton/', viewsCore.landingPageAdmin, name='admin_landing'),
     path('about/', viewsCore.about, name='about'),
-    path("", include("pos.urls")),
+    
+    # Admin
     path('admin/', admin.site.urls),
+    
+    # Apps
     path('products/', include('products.urls')),
-    path('pos/',viewsPOS.pos, name='pos'),
-    path('pos/orders',viewsPOS.orders, name='orders'),
-    path('pos/daily-report',viewsPOS.daily_sales_report, name='daily_sales_report'),
-    path('save_order/', viewsPOS.save_order),
-    path('save_order_online/', viewsProduct.save_order_online),
+    path('pos/', include('pos.urls')),
     path('inventory/', include('inventory.urls')),
     path('customers/', include('customers.urls')),
-
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
