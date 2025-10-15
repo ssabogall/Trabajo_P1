@@ -17,7 +17,7 @@ def product(request):
 
 def forms(request):
     # products = Product.objects.all()
-    return render(request,"forms.html",{ })
+    return render(request,"forms.html",{})
 
 #se esta usando esta parte
 def show_available_products(request):
