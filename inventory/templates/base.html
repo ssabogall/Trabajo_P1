@@ -3,42 +3,137 @@
 <html lang="es">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="" />
-    <meta name="author" content="" />
-    <title>Banetón</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Banetón | Sánduches y Panes de Masa Madre</title>
+
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
-    <!-- Core theme CSS (includes Bootstrap) -->
-    <link href="{% static 'inventory/css/styles.css' %}" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="{% static 'images/baneton.png' %}" />
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-        <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
-    <!-- Core theme CSS (includes Bootstrap) -->
-    <link href="{% static 'products/css/styles.css' %}" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #FAF3E0;
+            font-family: 'Poppins', sans-serif;
+            color: #6B4F3B;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #FAF3E0;
+            border-bottom: 2px solid #D4A373;
+            padding: 1rem 0;
+        }
+
+        .navbar-brand img {
+            height: 55px;
+        }
+
+        .nav-link {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: #6B4F3B !important;
+            margin: 0 12px;
+        }
+
+        .nav-link:hover {
+            color: #8E9775 !important;
+        }
+
+        .navbar__btn .button {
+            background-color: #4B2E05;
+            border-radius: 50%;
+            padding: 10px 12px;
+            color: white;
+            font-size: 18px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .navbar__btn .button:hover {
+            background-color: #8e9775;
+            color: #FFFFFF;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 2px solid #D4A373;
+            background-color: #EAD8C0;
+            color: #6B4F3B;
+            padding: 3rem 0;
+            margin-top: 3rem;
+            border-bottom: 2px solid #D4A373;
+        }
+
+        footer a {
+            color: #6B4F3B;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: #FFFFFF;
+        }
+
+        .footer-menu h5 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        /* Carousel */
+        .carousel-item img {
+            width: 100%;
+            height: 70vh;
+            object-fit: cover;
+            filter: brightness(80%);
+        }
+
+        .carousel-caption h1 {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #faf3e0;
+        }
+
+        /* Alert message (Banetón style) */
+        .alert {
+            background-color: #D4A373;
+            color: #4B2E05;
+            border: none;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <!-- Logo que lleva a landingpage -->
-            <a href="/" id="navbar__logo">
-                <img src="{% static 'images/baneton.png' %}" alt="LOGO">
+            <a href="/" class="navbar-brand">
+                <img src="{% static 'images/baneton.png' %}" alt="Banetón Logo">
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="#intro">Información</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#footer">Contacto</a></li>
+            <div class="collapse navbar-collapse" id="navbarMenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'products_home' %}">Nuestros Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Sobre Nosotros</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contacto">Contáctenos</a></li>
                     {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'customer_profile' %}">
@@ -63,7 +158,7 @@
                         </li>
                     {% endif %}
                     <li class="nav-item navbar__btn">
-                        <a href="/products/" class="button" target="_blank">
+                        <a href="{% url 'products_home' %}" class="button">
                             <i class="fa-solid fa-bread-slice"></i>
                         </a>
                     </li>
@@ -72,11 +167,9 @@
         </div>
     </nav>
 
-    <!-- Contenido dinámico -->
+    <!-- Content Block -->
     <div class="container mt-4">
-    <div id="alert-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </div>
     <br>
     <br>
@@ -91,42 +184,19 @@
      style="max-width: 30%;">
 
     <!-- Footer -->
-    <footer id="footer" class="mt-5">
+    <footer id="contacto" class="text-center">
         <div class="container">
-            <div class="d-flex flex-wrap justify-content-center align-items-start py-4" style="gap: 100px;">
-                <div style="max-width: 300px;">
-                    <div class="footer-menu footer-menu-001 text-center">
-                        <div class="footer-intro mb-3">
-                            <img src="{% static 'images/baneton.png' %}" alt="LOGO" style="width: 60%;">
-                        </div>
-                        <p>-----</p>
-                    </div>
-                </div>
-
-                <div style="max-width: 300px; margin-top: 50px;">
-                    <div class="footer-menu footer-menu-004 border-animation-left text-center">
-                        <h5 class="widget-title text-uppercase mb-3" style="font-weight: 700;">Contáctanos</h5>
-                        <p>
-                            <i class="fab fa-instagram"></i>
-                            <a href="https://www.instagram.com/baneton.pan" target="_blank">Instagram</a>
-                        </p>
-                        <p>
-                            <i class="fab fa-whatsapp"></i>
-                            <a href="http://wa.link/s8o9de" target="_blank">Whatsapp</a>
-                        </p>
-                        <p>
-                            <i class="fas fa-phone"></i>
-                            <a href="tel:+57 3504163688" target="_blank">350 416 36 88</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
+            <img src="{% static 'images/baneton.png' %}" alt="Banetón" style="width: 100px; margin-bottom: 1rem;">
+            <h5>Sánduches y Panes de Masa Madre</h5>
+            <p>Síguenos y conoce el sabor del pan artesanal.</p>
+            <p>
+                <a href="https://www.instagram.com/baneton.pan" target="_blank"><i class="fab fa-instagram"></i> Instagram</a> |
+                <a href="http://wa.link/s8o9de" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            </p>
+            <p style="font-size: 0.9rem; margin-top: 1rem;">© 2025 Banetón. Todos los derechos reservados.</p>
         </div>
     </footer>
 
-    {% block extra_scripts %}{% endblock %}
-    <script src="{% static 'inventory/js/scripts.js' %}"></script>
-     <!-- <script src="{% static 'products/js/scriptPOS.js' %}"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

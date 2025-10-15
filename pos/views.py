@@ -77,57 +77,57 @@ def orders(request):
     return render(request, "orders.html", context)
 
 
-@csrf_exempt  # ¡Solo para pruebas! En producción usa el CSRF token del template.
+
+@csrf_exempt  
 @require_POST
 def save_order(request):
-    """
-    Unifica ambos save_order:
-    - Cuenta cantidades por id de producto.
-    - Crea Order con paymentMethod.
-    - Si vienen datos de cliente y el modelo Customer existe, crea/relaciona el cliente.
-    """
-    data = json.loads(request.body or "{}")
-    orders_payload = data.get("orders", [])
-    if not orders_payload:
-        return JsonResponse({"status": "error", "message": "No hay items en la orden"}, status=400)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"status": "error", "message": "JSON inválido"}, status=400)
 
-    # Agrupar cantidades por producto
-    product_quantity = {}
-    for item in orders_payload:
-        pid = item.get("id")
-        if pid is None:
-            continue
-        product_quantity[pid] = product_quantity.get(pid, 0) + 1
+    orders = data.get("orders")
+    if not orders:
+        return JsonResponse({"status": "error", "message": "No hay productos en la orden"}, status=400)
 
-    # Crear Order (y opcionalmente Customer)
-    payment_method = orders_payload[0].get("paymentMethod")
+    payment_method = data.get("paymentMethod", "Cash")
+    customer_data = data.get("customer", {})
 
+    # Crear cliente si se envió alguno
     customer_obj = None
-    if HAS_CUSTOMER:
-        # Si el payload trae datos de cliente, lo creamos
-        cedula = orders_payload[0].get("cedula")
-        nombre = orders_payload[0].get("nombre")
-        correo = orders_payload[0].get("correo")
-        if cedula or nombre or correo:
-            customer_obj = Customer.objects.create(
-                cedula=cedula or "",
-                nombre=nombre or "",
-                correo=correo or "",
-            )
+    if HAS_CUSTOMER and (customer_data.get("cedula") or customer_data.get("nombre") or customer_data.get("correo")):
+        customer_obj = Customer.objects.create(
+            cedula=customer_data.get("cedula", ""),
+            nombre=customer_data.get("nombre", ""),
+            correo=customer_data.get("correo", ""),
+        )
 
-    # Soporta órdenes con/ sin customer según tu modelo
-    order_kwargs = {"paymentMethod": payment_method}
-    if HAS_CUSTOMER:
-        order_kwargs["customer"] = customer_obj
+    # Crear la orden
+    order = Order.objects.create(
+        paymentMethod=payment_method,
+        customer=customer_obj if HAS_CUSTOMER else None
+    )
 
-    order = Order.objects.create(**order_kwargs)
+    # Crear OrderItems respetando cantidades
+    for item in orders:
+        pid = item.get("id")
+        qty = int(item.get("quantity", 1))
 
-    # Crear OrderItems
-    for pid, quantity in product_quantity.items():
-        product = Product.objects.get(id=pid)
-        OrderItem.objects.create(order=order, product=product, quantity=quantity)
+        try:
+            product = Product.objects.get(id=pid)
+        except Product.DoesNotExist:
+            continue  # Ignora productos inválidos
 
-    return JsonResponse({"status": "success"})
+        OrderItem.objects.create(
+            order=order,
+            product=product,
+            quantity=qty
+        )
+
+    return JsonResponse({"status": "success", "order_id": order.id})
+
+
+
 
 
 # ---------------------------------

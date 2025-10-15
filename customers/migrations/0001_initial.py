@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('inventory', '0002_alter_order_customer'),
+        # ('inventory', '0002_alter_order_customer'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

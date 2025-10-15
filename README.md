@@ -112,7 +112,25 @@ Baneton/
    # En Linux/Mac:
    source venv/bin/activate
    ```
+   - Luego de de activar la primera vez con el comando anterior  ya puedes o volver a activar con el siguiente comando
 
+   ```bash
+   # En windows:
+   # (Activador)
+   venv\Scripipts\activate 
+
+   # (Desactivador)
+   deactivate
+
+   # En linux/Mac:
+   # (Desactivardor)
+   deactivate
+   
+   # O tambien puede utilizar
+   user@machine:/path/to/project$
+
+
+   ```
 3. **Instalar dependencias**
    ```bash
    pip install -r requirements.txt

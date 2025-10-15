@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
-from inventory.models import Product, Order,OrderItem, Customer
+from inventory.models import Product, Order,OrderItem, Customer, Comment
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime
@@ -10,30 +10,18 @@ from inventory.utils.pagination_helper import PaginationHelper
 import json
 
 
-
 # Create your views here.
-def product(request):
-    # Apply pagination
-    queryset = Product.objects.all()
-    pagination = PaginationHelper(
-        queryset=queryset,
-        request=request,
-        items_per_page=10,
-        order_by='name'  # Alphabetical order
-    )
-
-    context = {
-        'products': pagination.get_items(),
-        **pagination.get_context()
-    }
-    return render(request, "products.html", context)
-
 def forms(request):
-    # products = Product.objects.all()
-    return render(request,"forms.html",{ })
+    """
+    Vista para mostrar el formulario de registro de clientes
+    """
+    return render(request, "forms.html", {})
 
-#se esta usando esta parte
+
 def show_available_products(request):
+    """
+    Vista para mostrar los productos disponibles con búsqueda y paginación
+    """
     q = (request.GET.get("q") or "").strip()
     base = Product.objects.filter(quantity__gt=0)
 
@@ -73,17 +61,54 @@ def show_available_products(request):
     return render(request, "products.html", context)
 
 
-
 @csrf_exempt  # For testing only! Use proper CSRF token handling in production
 @require_POST
 def save_order_online(request):
+    """
+    Vista para guardar órdenes realizadas en línea
+    """
     data = json.loads(request.body)
     print(data)
-    customer = Customer.objects.create( cedula=data['customer']['cedula'], nombre=data['customer']['firstName'],correo="")
-    order = Order.objects.create(customer = customer,paymentMethod='Transfer')
+    customer = Customer.objects.create(
+        cedula=data['customer']['cedula'],
+        nombre=data['customer']['firstName'],
+        correo=""
+    )
+    order = Order.objects.create(customer=customer, paymentMethod='Transfer')
     
     for item in data['orders']:
         product = Product.objects.get(id=item['id'])
         OrderItem.objects.create(order=order, product=product, quantity=item['quantity'])
 
     return JsonResponse({'status': 'success'})
+
+
+def product_detail(request, product_id):
+    """
+    Vista para mostrar los detalles de un producto individual
+    """
+    product = Product.objects.get(id=product_id)
+    comments = product.comments.all()
+    return render(request, 'product_detail.html', {'product': product, 'comments': comments})
+
+
+@csrf_exempt
+@require_POST
+def add_comment(request, product_id):
+    """
+    Vista para agregar comentarios a un producto
+    """
+    if request.method == 'POST':
+        product = Product.objects.get(id=product_id)
+        name = request.POST.get('name')
+        comment_text = request.POST.get('comment')
+        
+        if name and comment_text:
+            Comment.objects.create(
+                product=product,
+                name=name,
+                text=comment_text
+            )
+        return redirect('product_detail', product_id=product_id)
+    
+    return redirect('products_home')
