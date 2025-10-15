@@ -17,6 +17,7 @@ import json
 
 # Models
 from inventory.models import Product, Order, OrderItem
+from inventory.utils.pagination_helper import PaginationHelper
 # Customer es opcional: si tu app lo tiene, lo usaremos al guardar una orden
 try:
     from inventory.models import Customer  # del primer código
@@ -42,14 +43,38 @@ def _sum_money(qs):
 # Vistas comunes de POS / Órdenes
 # -------------------------------
 def pos(request):
-    products = Product.objects.all()
-    return render(request, "pos.html", {"products": products})
+    # Apply pagination
+    queryset = Product.objects.all()
+    pagination = PaginationHelper(
+        queryset=queryset,
+        request=request,
+        items_per_page=10,
+        order_by='name'  # Alphabetical order
+    )
+
+    context = {
+        'products': pagination.get_items(),
+        **pagination.get_context()
+    }
+    return render(request, "pos.html", context)
 
 
 def orders(request):
-    orders_qs = Order.objects.all()
-    items = OrderItem.objects.all()
-    return render(request, "orders.html", {"orders": orders_qs, "items": items})
+    # Apply pagination to orders
+    orders_queryset = Order.objects.select_related('customer').all()
+    pagination = PaginationHelper(
+        queryset=orders_queryset,
+        request=request,
+        items_per_page=10,
+        order_by='date'  # Order by date (most recent first with '-date' if needed)
+    )
+
+    context = {
+        'orders': pagination.get_items(),
+        'items': OrderItem.objects.all(),
+        **pagination.get_context()
+    }
+    return render(request, "orders.html", context)
 
 
 

@@ -3,6 +3,7 @@ from .models import RawMaterial
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
+from .utils.pagination_helper import PaginationHelper
 
 def inventory(request):
     today = now().date()
@@ -12,10 +13,22 @@ def inventory(request):
     dismissed = request.GET.get("dismissed") == "1"
     show_modal = bool(expiring_soon) and not dismissed
 
-    return render(request, "inventory/inventory.html", {
-        "materias_primas": RawMaterial.objects.all(),
+    # Apply pagination
+    queryset = RawMaterial.objects.all()
+    pagination = PaginationHelper(
+        queryset=queryset,
+        request=request,
+        items_per_page=10,
+        order_by='name'  # Alphabetical order
+    )
+
+    context = {
+        "materias_primas": pagination.get_items(),
         "show_modal": show_modal,
-    })
+        **pagination.get_context()  # Add pagination context
+    }
+
+    return render(request, "inventory/inventory.html", context)
 
 def expiring_materials(request):
     today = timezone.now().date()

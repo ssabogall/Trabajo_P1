@@ -6,56 +6,75 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.http import require_POST
 from django.core.exceptions import MultipleObjectsReturned
+from inventory.utils.pagination_helper import PaginationHelper
 import json
 
 
-
 # Create your views here.
-def product(request):
-    products = Product.objects.all()
-    return render(request,"products.html",{ 'products': products})
-
 def forms(request):
-    # products = Product.objects.all()
-    return render(request,"forms.html",{})
+    """
+    Vista para mostrar el formulario de registro de clientes
+    """
+    return render(request, "forms.html", {})
 
-#se esta usando esta parte
+
 def show_available_products(request):
+    """
+    Vista para mostrar los productos disponibles con búsqueda y paginación
+    """
     q = (request.GET.get("q") or "").strip()
     base = Product.objects.filter(quantity__gt=0)
 
     if q:
         try:
             match = base.get(name__iexact=q)
-            products = [match]  # solo 1
+            products_list = [match]  # solo 1
+            results_count = 1
         except Product.DoesNotExist:
-            products = base.none()
+            products_list = []
+            results_count = 0
         except MultipleObjectsReturned:
             match = base.filter(name__iexact=q).order_by("id").first()
-            products = [match] if match else base.none()
+            products_list = [match] if match else []
+            results_count = len(products_list)
 
         return render(request, "products.html", {
-            "products": products,
+            "products": products_list,
             "q": q,
-            "results_count": len(products),
+            "results_count": results_count,
         })
 
-    products = base
-    return render(request, "products.html", {
-        "products": products,
-        "q": q,
-        "results_count": products.count(),
-    })
+    # Apply pagination for all products
+    pagination = PaginationHelper(
+        queryset=base,
+        request=request,
+        items_per_page=10,
+        order_by='name'
+    )
 
+    context = {
+        "products": pagination.get_items(),
+        "q": q,
+        "results_count": base.count(),
+        **pagination.get_context()
+    }
+    return render(request, "products.html", context)
 
 
 @csrf_exempt  # For testing only! Use proper CSRF token handling in production
 @require_POST
 def save_order_online(request):
+    """
+    Vista para guardar órdenes realizadas en línea
+    """
     data = json.loads(request.body)
     print(data)
-    customer = Customer.objects.create( cedula=data['customer']['cedula'], nombre=data['customer']['firstName'],correo="")
-    order = Order.objects.create(customer = customer,paymentMethod='Transfer')
+    customer = Customer.objects.create(
+        cedula=data['customer']['cedula'],
+        nombre=data['customer']['firstName'],
+        correo=""
+    )
+    order = Order.objects.create(customer=customer, paymentMethod='Transfer')
     
     for item in data['orders']:
         product = Product.objects.get(id=item['id'])
@@ -63,15 +82,22 @@ def save_order_online(request):
 
     return JsonResponse({'status': 'success'})
 
+
 def product_detail(request, product_id):
+    """
+    Vista para mostrar los detalles de un producto individual
+    """
     product = Product.objects.get(id=product_id)
     comments = product.comments.all()
-    return render(request, 'product_detail.html', {'product': product,'comments': comments})
+    return render(request, 'product_detail.html', {'product': product, 'comments': comments})
 
 
 @csrf_exempt
 @require_POST
 def add_comment(request, product_id):
+    """
+    Vista para agregar comentarios a un producto
+    """
     if request.method == 'POST':
         product = Product.objects.get(id=product_id)
         name = request.POST.get('name')
