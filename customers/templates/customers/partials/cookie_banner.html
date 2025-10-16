@@ -1,0 +1,236 @@
+{% load static %}
+<!-- Cookie Consent Banner -->
+<div id="cookie-banner" class="cookie-banner" style="display: none;">
+    <div class="cookie-content">
+        <div class="cookie-text">
+            <h5 class="cookie-title"><i class="fas fa-cookie-bite me-2"></i>We use cookies</h5>
+            <p class="cookie-description">
+                We use cookies to improve your experience on our website. 
+                By continuing to browse, you accept our use of cookies.
+            </p>
+        </div>
+        <div class="cookie-buttons">
+            <button id="accept-cookies-btn" class="btn btn-success">
+                <i class="fas fa-check me-2"></i>Accept
+            </button>
+            <button id="reject-cookies-btn" class="btn btn-outline-secondary">
+                <i class="fas fa-times me-2"></i>Reject
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Cookie Banner Styles -->
+<style>
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    z-index: 9999;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.cookie-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.cookie-text {
+    flex: 1;
+    min-width: 250px;
+}
+
+.cookie-title {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.cookie-description {
+    margin: 0;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.cookie-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cookie-buttons .btn {
+    padding: 10px 25px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.cookie-buttons .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: #fff;
+}
+
+.cookie-buttons .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.cookie-buttons .btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+}
+
+.cookie-buttons .btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .cookie-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .cookie-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .cookie-buttons .btn {
+        flex: 1;
+    }
+}
+</style>
+
+<!-- Cookie Banner JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cookieBanner = document.getElementById('cookie-banner');
+    const acceptBtn = document.getElementById('accept-cookies-btn');
+    const rejectBtn = document.getElementById('reject-cookies-btn');
+    
+    // Check if user has already made a choice
+    checkCookiePreference();
+    
+    function checkCookiePreference() {
+        // Check if cookie exists
+        const cookieAccepted = getCookie('cookies_accepted');
+        
+        if (cookieAccepted === null) {
+            // No preference set, show banner
+            cookieBanner.style.display = 'block';
+        }
+    }
+    
+    // Accept cookies
+    acceptBtn.addEventListener('click', function() {
+        saveCookiePreference(true);
+    });
+    
+    // Reject cookies
+    rejectBtn.addEventListener('click', function() {
+        saveCookiePreference(false);
+    });
+    
+    function saveCookiePreference(accepted) {
+        // First set the cookie immediately (fallback)
+        setCookie('cookies_accepted', accepted ? 'true' : 'false', 365);
+        
+        // Then try to save to database
+        fetch('/customers/cookies/accept/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                accepted: accepted
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.warn('Could not save cookie preference to database, but cookie was set locally');
+            }
+            return response.json().catch(() => ({}));
+        })
+        .then(data => {
+            console.log('Cookie preference processed:', data);
+        })
+        .catch(error => {
+            console.warn('Error saving cookie preference to database:', error);
+            // Cookie is already set locally, so just log the error
+        })
+        .finally(() => {
+            // Hide banner regardless of backend result
+            hideBanner();
+        });
+    }
+    
+    function hideBanner() {
+        cookieBanner.style.animation = 'slideDown 0.3s ease-out';
+        setTimeout(function() {
+            cookieBanner.style.display = 'none';
+        }, 300);
+    }
+    
+    // Helper function to get cookie value
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Helper function to set cookie
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
+    }
+});
+
+// Animation for hiding banner
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideDown {
+        from {
+            transform: translateY(0);
+        }
+        to {
+            transform: translateY(100%);
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>

@@ -54,8 +54,9 @@ class Order(models.Model):
         return self.date.strftime("%Y-%m-%d %H:%M:%S")
     
     def total_amount(self):
+        # [[MODIFICADO]] antes: sum(item.product.price * item.quantity ...)
         return sum(
-            item.product.price * item.quantity for item in self.orderitem_set.all()
+            ((item.unit_price or item.product.price) * item.quantity) for item in self.orderitem_set.all()
         )
     def products(self):
         return "\n".join(
@@ -64,6 +65,8 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    # [[AGREGADO]] unit_price: precio unitario congelado al momento de la venta (con promo)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
@@ -78,3 +81,34 @@ class Comment(models.Model):
     name = models.TextField()
     # score = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+# [[AGREGADO]] Promociones
+class Promotion(models.Model):
+    DISCOUNT_TYPE_CHOICES = [
+        ('fixed', 'Monto fijo'),
+        ('percent', 'Porcentaje'),
+    ]
+    name = models.CharField(max_length=100)
+    discount_type = models.CharField(max_length=10, choices=DISCOUNT_TYPE_CHOICES, default='fixed')
+    value = models.DecimalField(max_digits=10, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+    starts_at = models.DateTimeField(null=True, blank=True)
+    ends_at = models.DateTimeField(null=True, blank=True)
+    applies_to_all = models.BooleanField(default=False)
+    products = models.ManyToManyField(Product, blank=True, related_name='promotions')
+
+    def is_current(self):
+        now_ = timezone.now()
+        if not self.is_active:
+            return False
+        if self.starts_at and now_ < self.starts_at:
+            return False
+        if self.ends_at and now_ > self.ends_at:
+            return False
+        return True
+
+    def applies_to(self, product):
+        return self.applies_to_all or self.products.filter(pk=product.pk).exists()
+
+    def __str__(self):
+        return self.name

@@ -11,5 +11,6 @@ admin.site.register(OrderItem)
 admin.site.register(Customer)
 admin.site.register(Comment)
 
-
-
+# [[AGREGADO]] Registrar modelo Promotion en el admin
+from .models import Promotion
+admin.site.register(Promotion)

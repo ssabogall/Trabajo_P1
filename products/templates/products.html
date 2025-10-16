@@ -1,15 +1,40 @@
-{% extends "base_products.html" %}
+{% extends "base.html" %}
 {% block content %}
 {% load static %}
+{% load promo_tags %}
 
 
-<!-- Buscador -->
+<!-- [[MODIFICADO]] Buscador + filtros -->
 <section class="py-3">
     <div class="container px-4 px-lg-5">
-    <form method="get" class="d-flex" role="search">
-        <input class="form-control me-2" type="search" name="q"
-                placeholder="Buscar productos..." value="{{ q }}">
-        <button class="btn btn-outline-dark" type="submit">Buscar</button>
+    <form method="get" class="row g-2 align-items-end" role="search">
+        <div class="col-md-4">
+            <label class="form-label mb-0">Buscar</label>
+            <input class="form-control" type="search" name="q" placeholder="Buscar productos..." value="{{ q }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label mb-0">Precio mín</label>
+            <input class="form-control" type="number" name="min_price" min="0" step="1" value="{{ min_price }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label mb-0">Precio máx</label>
+            <input class="form-control" type="number" name="max_price" min="0" step="1" value="{{ max_price }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label mb-0">Orden</label>
+            <select class="form-select" name="order">
+                <option value="name_az" {% if order == 'name_az' %}selected{% endif %}>Nombre A→Z</option>
+                <option value="price_asc" {% if order == 'price_asc' %}selected{% endif %}>Precio: menor→mayor</option>
+                <option value="price_desc" {% if order == 'price_desc' %}selected{% endif %}>Precio: mayor→menor</option>
+            </select>
+        </div>
+        <div class="col-md-1 form-check mt-4">
+            <input class="form-check-input" type="checkbox" id="onlyPromo" name="only_promo" value="1" {% if only_promo %}checked{% endif %}>
+            <label class="form-check-label" for="onlyPromo">Solo en promoción</label>
+        </div>
+        <div class="col-12">
+            <button class="btn btn-outline-dark me-2" type="submit">Filtrar</button><a class="btn btn-secondary" href="{% url 'products_home' %}">Limpiar</a>
+        </div>
     </form>
     {% if q %}
         <small class="text-muted d-block mt-2">
@@ -21,9 +46,9 @@
 
 {% if products %}
     <section class="py-5">
-    <div class="container px-4 px-lg-5 mt-5">
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-{% for product in products %}
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                {% for product in products %}
                     <div class="col mb-5">
                         <div class="card h-100">
                             <img class="card-img-top" src="{{ product.picture.url }}" alt="{{ product.name }}">
@@ -32,7 +57,8 @@
                                     <a href="{% url 'product_detail' product.id %}" class="product-link">
                                         <h5 class="fw-bolder">{{ product.name }}</h5>
                                     </a>
-                                    ${{ product.price }}
+                                    {% if product|has_promo %}<span class="text-muted text-decoration-line-through">${{ product.price }}</span> <span class="fw-bold">${{ product|effective_price }}</span>{% else %}${{ product.price }}{% endif %}
+                                        {% if product|has_promo %}<div><span class="badge bg-warning text-dark mt-2">Promo</span></div>{% endif %}
                                 </div>
                             </div>
                             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
@@ -40,7 +66,7 @@
                                     <button 
                                         class="btn btn-outline-dark mt-auto add-to-cart-btn"
                                         data-name="{{ product.name }}"
-                                        data-price="{{ product.price }}"
+                                        data-price="{{ product|effective_price }}"
                                         data-id="{{ product.id }}"
                                     >
                                         <i class="fas fa-cart-plus me-1"></i>Agregar
@@ -50,13 +76,22 @@
                         </div>
                     </div>
                 {% endfor %}
+            </div>
+            
+            <!-- Include pagination component -->
+            {% include 'partials/pagination.html' %}
         </div>
-    </div>
     </section>
 {% else %}
-    <p>No hay productos disponibles.</p>
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="text-center">
+                <p class="lead">No hay productos disponibles en este momento.</p>
+            </div>
+        </div>
+    </section>
 {% endif %}
 
 
-    <script src="{% static 'products/js/scriptProducts.js' %}"></script>
+<script src="{% static 'products/js/scriptProducts.js' %}"></script>
 {% endblock %}

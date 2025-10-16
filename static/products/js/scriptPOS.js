@@ -208,7 +208,5 @@ function showAlert(message, type = 'info') {
     }, 3000);
 }
 
-// =========================
-// INIT
-// =========================
+
 updateCartDisplay();

@@ -149,5 +149,53 @@
     refresh();
     setInterval(refresh, 5000);
   </script>
+
+  <!-- [[AGREGADO]] Colores distintos por barra y por segmento (sin cambiar lógica existente) -->
+  <script>
+  (function(){
+    function makeColors(n, alpha){
+      n = Math.max(0, n|0);
+      const a = (alpha==null?0.85:alpha);
+      const arr = [];
+      for(let i=0;i<n;i++){
+        const h = (i*360/Math.max(1,n))%360;
+        arr.push(`hsl(${h} 70% 55% / ${a})`);
+      }
+      return arr;
+    }
+    function applyColors(){
+      try{
+        if (typeof topProducts !== 'undefined' && topProducts.data && topProducts.data.datasets && topProducts.data.datasets[0]){
+          topProducts.data.datasets[0].backgroundColor = makeColors((topProducts.data.datasets[0].data||[]).length, 0.8);
+          topProducts.update('none');
+        }
+        if (typeof unitsToday !== 'undefined' && unitsToday.data && unitsToday.data.datasets && unitsToday.data.datasets[0]){
+          unitsToday.data.datasets[0].backgroundColor = makeColors((unitsToday.data.datasets[0].data||[]).length, 0.8);
+          unitsToday.update('none');
+        }
+        if (typeof trendingProducts !== 'undefined' && trendingProducts.data && trendingProducts.data.datasets && trendingProducts.data.datasets[0]){
+          trendingProducts.data.datasets[0].backgroundColor = makeColors((trendingProducts.data.datasets[0].data||[]).length, 0.8);
+          trendingProducts.update('none');
+        }
+        if (typeof paymentsDonut !== 'undefined' && paymentsDonut.data && paymentsDonut.data.datasets && paymentsDonut.data.datasets[0]){
+          const n = (paymentsDonut.data.labels || []).length;
+          paymentsDonut.data.datasets[0].backgroundColor = makeColors(n, 0.85);
+          paymentsDonut.update('none');
+        }
+      }catch(e){ if (console && console.warn) console.warn('applyColors warn:', e); }
+    }
+    if (typeof refresh === 'function'){
+      const __oldRefresh = refresh;
+      window.refresh = async function(){
+        const res = await __oldRefresh.apply(this, arguments);
+        applyColors();
+        return res;
+      }
+    }
+    // Primera aplicación (por si ya cargó datos)
+    setTimeout(applyColors, 300);
+  })();
+  </script>
+
 </body>
 </html>

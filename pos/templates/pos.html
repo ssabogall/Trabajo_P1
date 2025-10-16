@@ -1,6 +1,10 @@
 {% extends "base.html" %}
-{% block content %}
 {% load static %}
+<<<<<<< HEAD
+{% block content %}
+=======
+{% load promo_tags %}
+>>>>>>> visulisador-de-disponibilidad
 
 <!-- Alert container -->
 <div id="alert-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
@@ -18,7 +22,7 @@
                                 <div class="card-body p-4">
                                     <div class="text-center">
                                         <h5 class="fw-bolder">{{ product.name }}</h5>
-                                        ${{ product.price }}
+                                        {% if product|has_promo %}<span class="text-muted text-decoration-line-through">${{ product.price }}</span> <span class="fw-bold">${{ product|effective_price }}</span><div><span class="badge bg-warning text-dark mt-2">Promo</span></div>{% else %}${{ product.price }}{% endif %}
                                     </div>
                                 </div>
                                 <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
@@ -26,7 +30,7 @@
                                         <button 
                                             class="btn btn-outline-dark mt-auto add-to-order-btn"
                                             data-name="{{ product.name }}"
-                                            data-price="{{ product.price }}"
+                                            data-price="{{ product|effective_price }}"
                                             data-id="{{ product.id }}"
                                         >Add</button>
                                     </div>
@@ -35,6 +39,9 @@
                         </div>
                     {% endfor %}
                 </div>
+
+                <!-- Include pagination component -->
+                {% include 'partials/pagination.html' %}
             {% else %}
                 <p>No hay productos disponibles.</p>
             {% endif %}

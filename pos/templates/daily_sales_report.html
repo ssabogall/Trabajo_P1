@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 daily-report-container">
     <div class="row mb-4">
         <div class="col-md-8">
             <h1 class="text-center">📊 Daily report of sales</h1>
@@ -22,26 +22,26 @@
     <!-- Métricas principales -->
     <div class="row mb-4">
         <div class="col-md-4">
-            <div class="card bg-primary text-white shadow">
+            <div class="card bg-primary shadow report-card">
                 <div class="card-body text-center">
-                    <h3 class="card-title">{{ total_revenue|floatformat:0 }}</h3>
-                    <p class="card-text">💰 Revenue Total</p>
+                    <h3 class="card-title report-text">{{ total_revenue|floatformat:0 }}</h3>
+                    <p class="card-text report-text">💰 Revenue Total</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bg-success text-white shadow">
+            <div class="card bg-success shadow report-card">
                 <div class="card-body text-center">
-                    <h3 class="card-title">{{ total_orders }}</h3>
-                    <p class="card-text">📋 Count of orders</p>
+                    <h3 class="card-title report-text">{{ total_orders }}</h3>
+                    <p class="card-text report-text">📋 Count of orders</p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card bg-info text-white shadow">
+            <div class="card bg-info shadow report-card">
                 <div class="card-body text-center">
-                    <h3 class="card-title">{{ average_per_order|floatformat:0 }}</h3>
-                    <p class="card-text">💸 Average per Order</p>
+                    <h3 class="card-title report-text">{{ average_per_order|floatformat:0 }}</h3>
+                    <p class="card-text report-text">💸 Average per Order</p>
                 </div>
             </div>
         </div>
@@ -51,31 +51,31 @@
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card shadow">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0">🏆 Product most sale</h5>
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0 report-text">🏆 Product most sale</h5>
                 </div>
                 <div class="card-body">
                     {% if most_sold_products %}
-                        <table class="table table-sm">
+                        <table class="table table-sm report-table">
                             <thead>
                                 <tr>
-                                    <th>Product</th>
-                                    <th>Quantity</th>
-                                    <th>Sales</th>
+                                    <th class="report-text">Product</th>
+                                    <th class="report-text">Quantity</th>
+                                    <th class="report-text">Sales</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for product_name, data in most_sold_products %}
                                 <tr>
-                                    <td>{{ product_name }}</td>
-                                    <td><span class="badge badge-primary">{{ data.total_quantity }}</span></td>
-                                    <td>${{ data.total_sales|floatformat:0 }}</td>
+                                    <td class="report-text">{{ product_name }}</td>
+                                    <td class="report-text"><span class="badge badge-primary report-badge">{{ data.total_quantity }}</span></td>
+                                    <td class="report-text">${{ data.total_sales|floatformat:0 }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     {% else %}
-                        <p class="text-muted">dont have any product for time period.</p>
+                        <p class="text-muted report-text">dont have any product for time period.</p>
                     {% endif %}
                 </div>
             </div>
@@ -84,23 +84,23 @@
         <!-- Métodos de pago -->
         <div class="col-md-6">
             <div class="card shadow">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">💳 form of payment</h5>
+                <div class="card-header bg-secondary">
+                    <h5 class="mb-0 report-text">💳 form of payment</h5>
                 </div>
                 <div class="card-body">
                     {% if payment_methods %}
-                        <table class="table table-sm">
+                        <table class="table table-sm report-table">
                             <thead>
                                 <tr>
-                                    <th>Payment Method</th>
-                                    <th>Orders</th>
-                                    <th>Total</th>
+                                    <th class="report-text">Payment Method</th>
+                                    <th class="report-text">Orders</th>
+                                    <th class="report-text">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for method, data in payment_methods %}
                                 <tr>
-                                    <td>
+                                    <td class="report-text">
                                         {% if method == "Cash" %}
                                             💵 Cash
                                         {% elif method == "Transfer" %}
@@ -109,14 +109,14 @@
                                             {{ method }}
                                         {% endif %}
                                     </td>
-                                    <td><span class="badge badge-success">{{ data.count }}</span></td>
-                                    <td>${{ data.total_amount|floatformat:0 }}</td>
+                                    <td class="report-text"><span class="badge badge-success report-badge">{{ data.count }}</span></td>
+                                    <td class="report-text">${{ data.total_amount|floatformat:0 }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     {% else %}
-                        <p class="text-muted">dont have any transactions about time period</p>
+                        <p class="text-muted report-text">dont have any transactions about time period</p>
                     {% endif %}
                 </div>
             </div>
@@ -127,43 +127,43 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0">📝 details about daily orders</h5>
+                <div class="card-header bg-dark">
+                    <h5 class="mb-0 report-text">📝 details about daily orders</h5>
                 </div>
                 <div class="card-body">
                     {% if daily_orders %}
-                        <table class="table table-bordered table-hover">
+                        <table class="table table-bordered table-hover report-table">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>hour</th>
-                                    <th>Payment Method</th>
-                                    <th>Products</th>
-                                    <th class="text-right">Total</th>
+                                    <th class="report-text">hour</th>
+                                    <th class="report-text">Payment Method</th>
+                                    <th class="report-text">Products</th>
+                                    <th class="text-right report-text">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for order in daily_orders %}
                                 <tr>
-                                    <td>{{ order.date|date:"H:i" }}</td>
-                                    <td>
+                                    <td class="report-text">{{ order.date|date:"H:i" }}</td>
+                                    <td class="report-text">
                                         {% if order.paymentMethod == "Cash" %}
-                                            <span class="badge badge-success">💵 Cash</span>
+                                            <span class="badge badge-success report-badge">💵 Cash</span>
                                         {% elif order.paymentMethod == "Transfer" %}
-                                            <span class="badge badge-info">🏦 Transfer</span>
+                                            <span class="badge badge-info report-badge">🏦 Transfer</span>
                                         {% else %}
-                                            <span class="badge badge-secondary">{{ order.paymentMethod }}</span>
+                                            <span class="badge badge-secondary report-badge">{{ order.paymentMethod }}</span>
                                         {% endif %}
                                     </td>
-                                    <td>{{ order.products|linebreaksbr }}</td>
-                                    <td class="text-right font-weight-bold">${{ order.total_amount|floatformat:0 }}</td>
+                                    <td class="report-text">{{ order.products|linebreaksbr }}</td>
+                                    <td class="text-right font-weight-bold report-text">${{ order.total_amount|floatformat:0 }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     {% else %}
                         <div class="text-center py-4">
-                            <p class="text-muted">📋 dont have any orders for this date.</p>
-                            <small> select other time or check that there are registered sales.</small>
+                            <p class="text-muted report-text">📋 dont have any orders for this date.</p>
+                            <small class="report-text"> select other time or check that there are registered sales.</small>
                         </div>
                     {% endif %}
                 </div>
@@ -184,14 +184,88 @@
     </div>
 </div>
 
-<!-- Estilos para impresión -->
+<!-- Estilos específicos para el reporte diario -->
 <style>
+/* 
+ * Daily Report Styles - Force black text for readability
+ * These styles override Bootstrap's default text-white classes
+ */
+
+/* Apply black color to all text within the report container */
+.daily-report-container .report-text,
+.daily-report-container .report-text *,
+.daily-report-container .report-card .card-title,
+.daily-report-container .report-card .card-text,
+.daily-report-container .report-table,
+.daily-report-container .report-table th,
+.daily-report-container .report-table td,
+.daily-report-container .report-table thead,
+.daily-report-container .report-table tbody,
+.daily-report-container .report-badge {
+    color: #000 !important;
+}
+
+/* Ensure all table elements have black text */
+.daily-report-container table,
+.daily-report-container table *,
+.daily-report-container .table,
+.daily-report-container .table th,
+.daily-report-container .table td {
+    color: #000 !important;
+}
+
+/* Override Bootstrap badge colors */
+.daily-report-container .badge,
+.daily-report-container .report-badge {
+    color: #000 !important;
+    background-color: #e9ecef !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+/* Ensure card headers have black text */
+.daily-report-container .card-header h5,
+.daily-report-container .card-header .report-text {
+    color: #000 !important;
+}
+
+/* Override text-white class specifically in report cards */
+.daily-report-container .card.bg-primary .report-text,
+.daily-report-container .card.bg-success .report-text,
+.daily-report-container .card.bg-info .report-text,
+.daily-report-container .card.bg-secondary .report-text,
+.daily-report-container .card.bg-dark .report-text {
+    color: #000 !important;
+}
+
+/* Ensure text-muted is also black in reports */
+.daily-report-container .text-muted,
+.daily-report-container .text-muted.report-text {
+    color: #000 !important;
+}
+
+/* Print styles */
 @media print {
-    .btn, .form-group, .form-inline {
+    /* Hide buttons and forms when printing */
+    .btn, 
+    .form-group, 
+    .form-inline,
+    button {
         display: none !important;
     }
+    
+    /* Full width for print */
     .container {
         max-width: 100% !important;
+    }
+    
+    /* Ensure all text is black when printing */
+    * {
+        color: #000 !important;
+    }
+    
+    /* Remove background colors for better printing */
+    .card {
+        border: 1px solid #000 !important;
     }
 }
 </style>
