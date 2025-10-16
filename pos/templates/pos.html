@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% load promo_tags %}
 {% block content %}
 
 <!-- Alert container -->
@@ -20,7 +20,7 @@
                                 <div class="card-body p-4">
                                     <div class="text-center">
                                         <h5 class="fw-bolder">{{ product.name }}</h5>
-                                        ${{ product.price }}
+                                        {% if product|has_promo %}<span class="text-muted text-decoration-line-through">${{ product.price }}</span> <span class="fw-bold">${{ product|effective_price }}</span><div><span class="badge bg-warning text-dark mt-2">Promo</span></div>{% else %}${{ product.price }}{% endif %}
                                     </div>
                                 </div>
                                 <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
@@ -28,7 +28,7 @@
                                         <button 
                                             class="btn btn-outline-dark mt-auto add-to-order-btn"
                                             data-name="{{ product.name }}"
-                                            data-price="{{ product.price }}"
+                                            data-price="{{ product|effective_price }}"
                                             data-id="{{ product.id }}"
                                         >
                                             <i class="fas fa-plus-circle me-1"></i>Add
@@ -40,6 +40,7 @@
                     {% endfor %}
                 </div>
                 
+
                 <!-- Include pagination component -->
                 {% include 'partials/pagination.html' %}
             {% else %}
@@ -106,7 +107,6 @@
     </div>
 </div>
 
-{% endblock %}
 
 {% block extra_scripts %}
 <script src="{% static 'products/js/scriptPOS.js' %}"></script>

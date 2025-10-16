@@ -30,7 +30,8 @@ except Exception:
 # Utilidades comunes / agregados
 # -------------------------------
 MONEY = DecimalField(max_digits=12, decimal_places=2)
-REVENUE_EXPR = ExpressionWrapper(F("product__price") * F("quantity"), output_field=MONEY)
+REVENUE_EXPR = ExpressionWrapper(F("unit_price") * F("quantity"), output_field=MONEY)
+# [[MODIFICADO]] Antes se multiplicaba product__price * quantity; ahora unit_price * quantity
 
 def _sum_money(qs):
     """Suma de ingresos: precio actual del producto * cantidad."""

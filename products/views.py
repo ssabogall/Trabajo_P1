@@ -8,41 +8,131 @@ from django.views.decorators.http import require_POST
 from django.core.exceptions import MultipleObjectsReturned
 from inventory.utils.pagination_helper import PaginationHelper
 import json
-
+from decimal import Decimal
+from inventory.promo_utils import price_after_discount, get_active_promotion_for
 
 # Create your views here.
+
+
+# [[AGREGADO]] Helper de filtrado/orden usando precio efectivo (con promo)
+def _filter_and_order_products(request):
+    qs = Product.objects.all()
+    # buscar por nombre (parcial, case-insensitive)
+    q = (request.GET.get('q') or '').strip()
+    if q:
+        qs = qs.filter(name__icontains=q)
+
+    products = list(qs)
+
+    # Función precio efectivo
+    def eff(p):
+        return price_after_discount(p)
+
+    # filtros de precio
+    min_price = (request.GET.get('min_price') or '').strip()
+    max_price = (request.GET.get('max_price') or '').strip()
+    if min_price:
+        try:
+            m = Decimal(min_price)
+            products = [p for p in products if eff(p) >= m]
+        except Exception:
+            pass
+    if max_price:
+        try:
+            M = Decimal(max_price)
+            products = [p for p in products if eff(p) <= M]
+        except Exception:
+            pass
+
+    # solo promoción
+    only_promo = (request.GET.get('only_promo') or '') in ['on','1','true','True']
+
+    if only_promo:
+        products = [p for p in products if get_active_promotion_for(p)]
+
+    # orden
+    order = (request.GET.get('order') or 'name_az')
+    if order == 'price_asc':
+        products.sort(key=lambda p: (eff(p), p.name.lower()))
+    elif order == 'price_desc':
+        products.sort(key=lambda p: (eff(p), p.name.lower()), reverse=True)
+    else:
+        products.sort(key=lambda p: p.name.lower())
+
+    ctx = {
+        'products': products,
+        'q': q,
+        'min_price': min_price,
+        'max_price': max_price,
+        'order': order,
+        'only_promo': '1' if only_promo else '',
+    }
+    return ctx
+
+def product(request):
+    # [[MODIFICADO]] Agregado filtrado y ordenamiento por GET params (q, min_price, max_price, only_promo, order)
+    qs = Product.objects.all()
+
+    q = request.GET.get('q', '').strip()
+    if q:
+        qs = qs.filter(name__icontains=q)
+
+    # Convert to list for Python-side filtering by precio efectivo
+    products = list(qs)
+
+    # Filtros por precio mínimo y máximo usando precio efectivo (con promo)
+    min_price = request.GET.get('min_price', '').strip()
+    max_price = request.GET.get('max_price', '').strip()
+
+    def eff(p): 
+        return price_after_discount(p)
+
+    if min_price:
+        try:
+            m = Decimal(min_price)
+            products = [p for p in products if eff(p) >= m]
+        except Exception:
+            pass
+    if max_price:
+        try:
+            M = Decimal(max_price)
+            products = [p for p in products if eff(p) <= M]
+        except Exception:
+            pass
+
+    # Solo productos en promoción
+    only_promo = request.GET.get('only_promo') in ['on', '1', 'true', 'True']
+    if only_promo:
+        products = [p for p in products if get_active_promotion_for(p)]
+
+    # Orden: nombre A-Z (default), precio asc, precio desc (con promo)
+    order = request.GET.get('order', 'name_az')
+    if order == 'price_asc':
+        products.sort(key=lambda p: (eff(p), p.name.lower()))
+    elif order == 'price_desc':
+        products.sort(key=lambda p: (eff(p), p.name.lower()), reverse=True)
+    else:
+        products.sort(key=lambda p: p.name.lower())
+
+    ctx = {
+        'products': products,
+        'q': q,
+        'min_price': min_price,
+        'max_price': max_price,
+        'order': order,
+        'only_promo': '1' if only_promo else '',
+    }
+    return render(request, "products.html", ctx)
+
 def forms(request):
-    """
-    Vista para mostrar el formulario de registro de clientes
-    """
-    return render(request, "forms.html", {})
+    # products = Product.objects.all()
+    return render(request,"forms.html",{})
 
 
 def show_available_products(request):
-    """
-    Vista para mostrar los productos disponibles con búsqueda y paginación
-    """
-    q = (request.GET.get("q") or "").strip()
-    base = Product.objects.filter(quantity__gt=0)
-
-    if q:
-        try:
-            match = base.get(name__iexact=q)
-            products_list = [match]  # solo 1
-            results_count = 1
-        except Product.DoesNotExist:
-            products_list = []
-            results_count = 0
-        except MultipleObjectsReturned:
-            match = base.filter(name__iexact=q).order_by("id").first()
-            products_list = [match] if match else []
-            results_count = len(products_list)
-
-        return render(request, "products.html", {
-            "products": products_list,
-            "q": q,
-            "results_count": results_count,
-        })
+    # [[MODIFICADO]] usar helper de filtrado/orden y mantener valores elegidos
+    ctx = _filter_and_order_products(request)
+    return render(request, "products.html", ctx)
 
     # Apply pagination for all products
     pagination = PaginationHelper(
