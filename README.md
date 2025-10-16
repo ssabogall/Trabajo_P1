@@ -97,7 +97,7 @@ Baneton/
 
 1. **Clonar el repositorio**
    ```bash
-   git clone [URL_DEL_REPOSITORIO]
+   git clone https://github.com/ssabogall/Trabajo_P1.git
    cd Trabajo_P1
    ```
 
