@@ -71,7 +71,8 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     def __str__(self):
-        return f"{self.product.name} {self.quantity} {self.order.date.strftime("%Y-%m-%d %H:%M:%S")}"
+        return f"{self.product.name} {self.quantity} {self.order.date.strftime('%Y-%m-%d %H:%M:%S')}"
+
 
 
 
