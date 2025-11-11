@@ -31,6 +31,60 @@ def inventory(request):
 
     return render(request, "inventory/inventory.html", context)
 
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from .models import RawMaterial
+from django.utils import timezone
+from datetime import timedelta
+
+def generate_shopping_list(request):
+    today = timezone.now().date()
+    warning_date = today + timedelta(days=5)
+
+    # Filter raw materials that are expiring soon (within 5 days)
+    expiring_soon = RawMaterial.objects.filter(
+        exp_date__lte=warning_date, 
+        exp_date__gte=today
+    ).order_by('exp_date')
+
+    # Create the HTTP response with content type as PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="shopping_list.pdf"'
+
+    # Create the PDF using ReportLab
+    p = canvas.Canvas(response, pagesize=letter)
+
+    # Set up the title
+    p.setFont("Helvetica", 16)
+    p.drawString(200, 750, "Shopping List: Items Expiring Soon")
+
+    # Set up table headers
+    p.setFont("Helvetica", 12)
+    p.drawString(50, 700, "Name")
+    p.drawString(200, 700, "Units")
+    p.drawString(350, 700, "Expiration Date")
+
+    # Draw the list of expiring items
+    y_position = 680
+    for mp in expiring_soon:
+        p.drawString(50, y_position, mp.name)
+        p.drawString(200, y_position, str(mp.units))
+        p.drawString(350, y_position, str(mp.exp_date))
+        y_position -= 20  # Move to next line
+
+    # Save the PDF (only once)
+    p.showPage()  # Finish the current page (if more pages are needed)
+    p.save()  # Finalize the PDF document
+
+    return response
+
+
+
+
 def expiring_materials(request):
     today = timezone.now().date()
     warning_date = today + timedelta(days=5)
@@ -75,12 +129,12 @@ def create_raw_material(request):
         units = request.POST.get('units')
         exp_date = request.POST.get('exp_date')
 
-        RawMaterial.objects.create(
+        rawMaterial = RawMaterial.objects.create(
             name=name,
             units=units,
             exp_date=exp_date
         )
-        registrar_entrada(name, units)
+        registrar_entrada(rawMaterial, units)
         return redirect('inventory')
 
     return render(request, 'inventory/create_raw_material.html')

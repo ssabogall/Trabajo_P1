@@ -7,5 +7,6 @@ urlpatterns = [
     path('editar/<int:pk>/', views.editar_materia_prima, name='editar_materia'),
     path('create/', views.create_raw_material, name='create_raw_material'),
     path('history/', views.inventory_history, name='inventory_history'),
+    path('generate_shopping_list_pdf/', views.generate_shopping_list, name='generate_shopping_list'),
 
 ]
