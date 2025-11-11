@@ -46,9 +46,9 @@
 
 {% if products %}
     <section class="py-5">
-    <div class="container px-4 px-lg-5 mt-5">
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-{% for product in products %}
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                {% for product in products %}
                     <div class="col mb-5">
                         <div class="card h-100">
                             <img class="card-img-top" src="{{ product.picture.url }}" alt="{{ product.name }}">
@@ -76,13 +76,22 @@
                         </div>
                     </div>
                 {% endfor %}
+            </div>
+            
+            <!-- Include pagination component -->
+            {% include 'partials/pagination.html' %}
         </div>
-    </div>
     </section>
 {% else %}
-    <p>No hay productos disponibles.</p>
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="text-center">
+                <p class="lead">No hay productos disponibles en este momento.</p>
+            </div>
+        </div>
+    </section>
 {% endif %}
 
 
-    <script src="{% static 'products/js/scriptProducts.js' %}"></script>
+<script src="{% static 'products/js/scriptProducts.js' %}"></script>
 {% endblock %}

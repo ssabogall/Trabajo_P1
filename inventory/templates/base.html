@@ -35,10 +35,41 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarMenu">
                 <ul class="navbar-nav ms-auto">
+                    {% if request.user.is_staff %}
+                        <!-- Botón visible solo para staff -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'adminbaneton' %}">
+                                admin
+                            </a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'products_home' %}">Nuestros Productos</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Sobre Nosotros</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contacto">Contáctenos</a></li>
                     
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'customer_profile' %}">
+                                <i class="fas fa-user-circle"></i> {{ user.username }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'customer_logout' %}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'customer_login' %}">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'customer_register' %}">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item navbar__btn">
                         <div class="nav-item button" id="cart-icon">
                             <i class="fa-solid fa-cart-shopping"></i>
@@ -82,6 +113,17 @@
     <div class="container mt-4">
         {% block content %}{% endblock %}
     </div>
+    <br>
+    <br>
+    <br>
+
+    <!-- Cookie Banner -->
+    {% include 'customers/partials/cookie_banner.html' %}
+
+    <img src="{% static '/images/illust_logo.svg' %}" 
+     alt="no image" 
+     class="img-fluid d-block mx-auto" 
+     style="max-width: 30%;">
 
     <!-- Footer -->
     <footer id="contacto" class="text-center">

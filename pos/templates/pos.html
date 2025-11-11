@@ -1,7 +1,8 @@
 {% extends "base.html" %}
-{% block content %}
 {% load static %}
+{% block content %}
 {% load promo_tags %}
+
 
 <!-- Alert container -->
 <div id="alert-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
@@ -36,6 +37,9 @@
                         </div>
                     {% endfor %}
                 </div>
+
+                <!-- Include pagination component -->
+                {% include 'partials/pagination.html' %}
             {% else %}
                 <p>No hay productos disponibles.</p>
             {% endif %}

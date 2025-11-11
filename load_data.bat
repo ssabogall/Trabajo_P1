@@ -1,3 +1,4 @@
+python manage.py makemigrations inventory
 python manage.py makemigrations
 python manage.py migrate
 python manage.py ad_products_db 

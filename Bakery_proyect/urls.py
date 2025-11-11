@@ -28,7 +28,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('',viewsCore.landingPage),
-    path('adminbaneton/',viewsCore.landingPageAdmin),
+    path('adminbaneton/',viewsCore.landingPageAdmin,name = 'adminbaneton'),
     path('about/', viewsCore.about, name='about'),
     path("", include("pos.urls")),
     path('admin/', admin.site.urls),
@@ -39,6 +39,7 @@ urlpatterns = [
     path('save_order/', viewsPOS.save_order),
     path('save_order_online/', viewsProduct.save_order_online),
     path('inventory/', include('inventory.urls')),
+    path('customers/', include('customers.urls')),
 
 ]
 if settings.DEBUG:
