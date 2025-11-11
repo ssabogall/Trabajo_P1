@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from .utils.pagination_helper import PaginationHelper
+from .models import MovimientosInventario
 
 def inventory(request):
     today = now().date()
@@ -46,10 +47,22 @@ def editar_materia_prima(request, pk):
     materia = get_object_or_404(RawMaterial, pk=pk)
 
     if request.method == 'POST':
+        nueva_cantidad = int(request.POST.get('units'))
+        anterior_cantidad = materia.units
+
+        # Actualizar materia prima
         materia.name = request.POST.get('name')
-        materia.units = request.POST.get('units')
+        materia.units = nueva_cantidad
         materia.exp_date = request.POST.get('exp_date')
         materia.save()
+
+        # Comparar cantidades para registrar entrada o salida
+        diferencia = nueva_cantidad - anterior_cantidad
+        if diferencia > 0:
+            registrar_entrada(materia, diferencia)
+        elif diferencia < 0:
+            registrar_salida(materia, abs(diferencia))
+
         return redirect('inventory')
 
     return render(request, 'inventory/editar_materia.html', {'materia': materia})
@@ -67,7 +80,27 @@ def create_raw_material(request):
             units=units,
             exp_date=exp_date
         )
+        registrar_entrada(name, units)
         return redirect('inventory')
 
     return render(request, 'inventory/create_raw_material.html')
 
+
+def registrar_entrada(material, cantidad):
+    MovimientosInventario.objects.create(
+        material=material,
+        movement_type='IN',
+        quantity=cantidad
+    )
+
+def registrar_salida(material, cantidad):
+    MovimientosInventario.objects.create(
+        material=material,
+        movement_type='OUT',
+        quantity=cantidad
+    )
+
+
+def inventory_history(request):
+    movimientos = MovimientosInventario.objects.all().order_by('-date')
+    return render(request, 'inventory/inventory_history.html', {'movements': movimientos})

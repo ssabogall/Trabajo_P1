@@ -113,3 +113,18 @@ class Promotion(models.Model):
 
     def __str__(self):
         return self.name
+    
+class MovimientosInventario(models.Model):
+    MOVEMENT_TYPES = [
+        ('IN', 'Entrada'),
+        ('OUT', 'Salida'),
+    ]
+    
+    material = models.ForeignKey('RawMaterial', on_delete=models.CASCADE)
+    movement_type = models.CharField(max_length=3, choices=MOVEMENT_TYPES)
+    quantity = models.FloatField()
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.material.name} - {self.get_movement_type_display()} ({self.quantity})"
+

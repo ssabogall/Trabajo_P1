@@ -1,0 +1,38 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Historial de Movimientos</h2>
+
+    <table class="table table-bordered">
+        <table class="table table-bordered">
+            <thead>
+                <th>Fecha</th>
+                <th>Material</th>
+                <th>Tipo</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for mov in movements %}
+            <tr>
+                <td>{{ mov.date|date:"d M Y, H:i" }}</td>
+                <td>{{ mov.material.name }}</td>
+                <td>
+                    {% if mov.movement_type == 'IN' %}
+                        <span class="badge bg-success">Entrada</span>
+                    {% else %}
+                        <span class="badge bg-danger">Salida</span>
+                    {% endif %}
+                </td>
+                <td>{{ mov.quantity }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No hay movimientos registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
