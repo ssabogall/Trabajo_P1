@@ -23,7 +23,7 @@ from core import views as viewsCore
 urlpatterns = [
     # Core pages
     path('', viewsCore.landingPage, name='landing'),
-    path('adminbaneton/', viewsCore.landingPageAdmin, name='admin_landing'),
+    path('adminbaneton/', viewsCore.landingPageAdmin, name='adminbaneton'),
     path('about/', viewsCore.about, name='about'),
     
     # Admin
