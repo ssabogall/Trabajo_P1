@@ -131,7 +131,21 @@ def show_available_products(request):
     return render(request, "products.html", ctx)
 
     # Nota: tu bloque de paginación quedaba tras el return; lo mantengo sin tocar.
+    # Apply pagination for all products
+    pagination = PaginationHelper(
+        queryset=base,
+        request=request,
+        items_per_page=10,
+        order_by='name'
+    )
 
+    context = {
+        "products": pagination.get_items(),
+        "q": q,
+        "results_count": base.count(),
+        **pagination.get_context()
+    }
+    return render(request, "products.html", context)
 
 # ============================================
 # Guardar órdenes realizadas en línea (API)
