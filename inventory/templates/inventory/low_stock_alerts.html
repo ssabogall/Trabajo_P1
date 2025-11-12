@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Alertas de Stock Bajo - Banetón{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'inventory/css/styles.css' %}">
+<style>
+    .alert-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    .alert-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .alert-stats {
+        display: flex;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .stat-card {
+        background: rgba(255,255,255,0.2);
+        padding: 15px 25px;
+        border-radius: 10px;
+        flex: 1;
+    }
+
+    .stat-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.9em;
+        opacity: 0.9;
+        margin-top: 5px;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 5px solid #ffc107;
+    }
+
+    .product-card.critical {
+        border-left-color: #dc3545;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .product-name {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .stock-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .stock-label {
+        color: #666;
+        font-size: 0.9em;
+    }
+
+    .stock-value {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .stock-value.warning {
+        color: #ffc107;
+    }
+
+    .stock-value.critical {
+        color: #dc3545;
+    }
+
+    .progress-bar-container {
+        width: 100%;
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 10px 0;
+    }
+
+    .progress-bar {
+        height: 100%;
+        transition: width 0.3s ease;
+        background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);
+    }
+
+    .action-button {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.9em;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+
+    .action-button:hover {
+        background: #5568d3;
+        transform: scale(1.05);
+    }
+
+    .no-alerts {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .no-alerts-icon {
+        font-size: 4em;
+        color: #28a745;
+        margin-bottom: 20px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+
+    .badge-critical {
+        background: #dc3545;
+        color: white;
+    }
+
+    .badge-warning {
+        background: #ffc107;
+        color: #000;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="alert-container">
+    <!-- Header con estadísticas -->
+    <div class="alert-header">
+        <h1 style="margin: 0 0 10px 0; font-size: 2.5em;">
+            🚨 Alertas de Stock Bajo
+        </h1>
+        <p style="margin: 0; opacity: 0.9;">
+            Sistema de monitoreo de inventario en tiempo real
+        </p>
+        
+        <div class="alert-stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_alerts }}</div>
+                <div class="stat-label">Alertas Activas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ critical_count }}</div>
+                <div class="stat-label">Críticas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ low_stock_products|length|add:"-"|add:critical_count }}</div>
+                <div class="stat-label">Advertencias</div>
+            </div>
+        </div>
+    </div>
+
+    {% if low_stock_products %}
+        <div class="products-grid">
+            {% for product in low_stock_products %}
+            <div class="product-card {% if product.quantity < product.reorder_threshold|divisibleby:2 %}critical{% endif %}">
+                <div class="product-name">
+                    {{ product.name }}
+                </div>
+                
+                <div class="stock-info">
+                    <span class="stock-label">Stock Actual:</span>
+                    <span class="stock-value {% if product.quantity < product.reorder_threshold|divisibleby:2 %}critical{% else %}warning{% endif %}">
+                        {{ product.quantity }} unidades
+                    </span>
+                </div>
+                
+                <div class="stock-info">
+                    <span class="stock-label">Umbral de Reorden:</span>
+                    <span class="stock-value">
+                        {{ product.reorder_threshold }} unidades
+                    </span>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: {% widthratio product.quantity product.reorder_threshold 100 %}%"></div>
+                </div>
+
+                <div style="font-size: 0.85em; color: #666; margin: 10px 0;">
+                    Nivel: {% widthratio product.quantity product.reorder_threshold 100 %}% del umbral
+                </div>
+
+                {% if product.quantity < product.reorder_threshold|divisibleby:2 %}
+                    <span class="badge badge-critical">⚠️ CRÍTICO</span>
+                {% else %}
+                    <span class="badge badge-warning">⚡ ADVERTENCIA</span>
+                {% endif %}
+
+                <a href="{% url 'product_detail' product.pk %}" class="action-button">
+                    Ver Detalles →
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-alerts">
+            <div class="no-alerts-icon">✅</div>
+            <h2 style="color: #28a745; margin: 0 0 10px 0;">
+                ¡Todo en orden!
+            </h2>
+            <p style="color: #666; margin: 0;">
+                No hay productos con stock bajo en este momento.
+            </p>
+            <a href="{% url 'inventory' %}" class="action-button" style="margin-top: 20px;">
+                Ver Inventario Completo
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Botón para volver -->
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{% url 'inventory' %}" class="action-button" style="background: #6c757d;">
+            ← Volver al Inventario
+        </a>
+    </div>
+</div>
+{% endblock %}
