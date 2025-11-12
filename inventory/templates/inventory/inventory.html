@@ -17,6 +17,7 @@
           </div>
           <div class="modal-footer justify-content-center">
             <a href="{% url 'expiring_materials' %}" class="btn btn-danger">Revisar</a>
+            <a href="{% url 'generate_shopping_list' %}" class="btn btn-danger">Generar lista compras</a>
             <a href="{% url 'inventory' %}?dismissed=1" class="btn btn-secondary">Cerrar</a>
           </div>
         </div>
@@ -31,6 +32,8 @@
                     Materias Primas
                     <a href="{% url 'create_raw_material' %}" class="btn btn-light btn-sm">+ Añadir materia prima</a>
                     <a href="{% url 'inventory_history' %}" class="btn btn-light btn-sm">+ Historial de inventario</a>
+
+
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
@@ -58,7 +61,10 @@
                             </tr>
                             {% endfor %}
                         </tbody>
+
                     </table>
+                       
+ 
                     
                     <!-- Include pagination component -->
                     {% include 'partials/pagination.html' %}
@@ -67,5 +73,8 @@
         </div>
     </div>
 </div>
+
+
+
 {% endblock %}
 
