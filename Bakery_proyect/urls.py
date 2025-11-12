@@ -16,15 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin # type: ignore
 from django.urls import path, include # type: ignore
-from Bakery_proyect import settings
+from django.conf import settings
+from django.conf.urls.static import static
 from core import views as viewsCore
 
 urlpatterns = [
     # Core pages
     path('', viewsCore.landingPage, name='landing'),
     path('adminbaneton/', viewsCore.landingPageAdmin, name='admin_landing'),
-    path('',viewsCore.landingPage),
-    path('adminbaneton/',viewsCore.landingPageAdmin),
     path('about/', viewsCore.about, name='about'),
     
     # Admin
@@ -38,4 +37,4 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += settings.STATIC_URL(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
