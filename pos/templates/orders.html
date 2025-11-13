@@ -1,12 +1,11 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-center mb-0">Sales</h1>
+        <h1 class="text-center mb-0">Ventas</h1>
         <a href="{% url 'daily_sales_report' %}" class="btn btn-success">
-            📊 Daily report
+            📊 Reporte diario
         </a>
     </div>
 
@@ -19,14 +18,11 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Date and Time</th>
-                                <th>Payment Method</th>
-                                <th>Products</th>
-
-                                <th>Amount</th>
-                                <th>Name-ID</th>
-
-
+                                <th>Fecha y hora</th>
+                                <th>Método de pago</th>
+                                <th>Productos</th>
+                                <th>Monto</th>
+                                <th>Nombre - Cédula</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -36,20 +32,17 @@
                                 <td>{{ order.paymentMethod }}</td>
                                 <td>{{ order.products|linebreaksbr }}</td>
                                 <td>{{ order.total_amount }}</td>
-                                <td>{{ order.customer.nombre  }} - {{order.customer.cedula}}</td>
-                                
-
-
+                                <td>{{ order.customer.nombre }} - {{ order.customer.cedula }}</td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4" class="text-center">Don't have raw materials registered</td>
+                                <td colspan="5" class="text-center">No hay ventas registradas</td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                     
-                    <!-- Include pagination component -->
+                    <!-- Incluir componente de paginación -->
                     {% include 'partials/pagination.html' %}
                 </div>
             </div>
@@ -58,4 +51,3 @@
 </div>
 
 {% endblock %}
-

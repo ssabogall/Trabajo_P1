@@ -4,7 +4,7 @@
 <div class="container mt-5 daily-report-container">
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1 class="text-center">📊 Daily report of sales</h1>
+            <h1 class="text-center">📊 Reporte diario de ventas</h1>
             <h4 class="text-center text-muted">{{ report_date|date:"d/m/Y" }}</h4>
         </div>
         <div class="col-md-4 text-right">
@@ -14,7 +14,7 @@
                     <input type="date" id="date" name="date" class="form-control mr-2" 
                            value="{{ report_date|date:'Y-m-d' }}">
                 </div>
-                <button type="submit" class="btn btn-primary">Ver Reporte</button>
+                <button type="submit" class="btn btn-primary">Ver reporte</button>
             </form>
         </div>
     </div>
@@ -25,7 +25,7 @@
             <div class="card bg-primary shadow report-card">
                 <div class="card-body text-center">
                     <h3 class="card-title report-text">{{ total_revenue|floatformat:0 }}</h3>
-                    <p class="card-text report-text">💰 Revenue Total</p>
+                    <p class="card-text report-text">💰 Ingreso total</p>
                 </div>
             </div>
         </div>
@@ -33,7 +33,7 @@
             <div class="card bg-success shadow report-card">
                 <div class="card-body text-center">
                     <h3 class="card-title report-text">{{ total_orders }}</h3>
-                    <p class="card-text report-text">📋 Count of orders</p>
+                    <p class="card-text report-text">📋 Cantidad de pedidos</p>
                 </div>
             </div>
         </div>
@@ -41,7 +41,7 @@
             <div class="card bg-info shadow report-card">
                 <div class="card-body text-center">
                     <h3 class="card-title report-text">{{ average_per_order|floatformat:0 }}</h3>
-                    <p class="card-text report-text">💸 Average per Order</p>
+                    <p class="card-text report-text">💸 Promedio por pedido</p>
                 </div>
             </div>
         </div>
@@ -52,16 +52,16 @@
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-header bg-warning">
-                    <h5 class="mb-0 report-text">🏆 Product most sale</h5>
+                    <h5 class="mb-0 report-text">🏆 Producto más vendido</h5>
                 </div>
                 <div class="card-body">
                     {% if most_sold_products %}
                         <table class="table table-sm report-table">
                             <thead>
                                 <tr>
-                                    <th class="report-text">Product</th>
-                                    <th class="report-text">Quantity</th>
-                                    <th class="report-text">Sales</th>
+                                    <th class="report-text">Producto</th>
+                                    <th class="report-text">Cantidad</th>
+                                    <th class="report-text">Ventas</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -75,7 +75,7 @@
                             </tbody>
                         </table>
                     {% else %}
-                        <p class="text-muted report-text">dont have any product for time period.</p>
+                        <p class="text-muted report-text">No hay productos registrados en este periodo.</p>
                     {% endif %}
                 </div>
             </div>
@@ -85,15 +85,15 @@
         <div class="col-md-6">
             <div class="card shadow">
                 <div class="card-header bg-secondary">
-                    <h5 class="mb-0 report-text">💳 form of payment</h5>
+                    <h5 class="mb-0 report-text">💳 Formas de pago</h5>
                 </div>
                 <div class="card-body">
                     {% if payment_methods %}
                         <table class="table table-sm report-table">
                             <thead>
                                 <tr>
-                                    <th class="report-text">Payment Method</th>
-                                    <th class="report-text">Orders</th>
+                                    <th class="report-text">Método de pago</th>
+                                    <th class="report-text">Pedidos</th>
                                     <th class="report-text">Total</th>
                                 </tr>
                             </thead>
@@ -102,9 +102,9 @@
                                 <tr>
                                     <td class="report-text">
                                         {% if method == "Cash" %}
-                                            💵 Cash
+                                            💵 Efectivo
                                         {% elif method == "Transfer" %}
-                                            🏦 Transfer
+                                            🏦 Transferencia
                                         {% else %}
                                             {{ method }}
                                         {% endif %}
@@ -116,7 +116,7 @@
                             </tbody>
                         </table>
                     {% else %}
-                        <p class="text-muted report-text">dont have any transactions about time period</p>
+                        <p class="text-muted report-text">No hay transacciones registradas en este periodo.</p>
                     {% endif %}
                 </div>
             </div>
@@ -127,17 +127,17 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow">
-                <div class="card-header bg-dark">
-                    <h5 class="mb-0 report-text">📝 details about daily orders</h5>
+                <div class="card-header" style="background-color: rgb(139, 54, 142);">
+                    <h5 class="mb-0 report-text">📝 Detalles de los pedidos diarios</h5>
                 </div>
                 <div class="card-body">
                     {% if daily_orders %}
                         <table class="table table-bordered table-hover report-table">
                             <thead class="thead-light">
                                 <tr>
-                                    <th class="report-text">hour</th>
-                                    <th class="report-text">Payment Method</th>
-                                    <th class="report-text">Products</th>
+                                    <th class="report-text">Hora</th>
+                                    <th class="report-text">Método de pago</th>
+                                    <th class="report-text">Productos</th>
                                     <th class="text-right report-text">Total</th>
                                 </tr>
                             </thead>
@@ -147,9 +147,9 @@
                                     <td class="report-text">{{ order.date|date:"H:i" }}</td>
                                     <td class="report-text">
                                         {% if order.paymentMethod == "Cash" %}
-                                            <span class="badge badge-success report-badge">💵 Cash</span>
+                                            <span class="badge badge-success report-badge">💵 Efectivo</span>
                                         {% elif order.paymentMethod == "Transfer" %}
-                                            <span class="badge badge-info report-badge">🏦 Transfer</span>
+                                            <span class="badge badge-info report-badge">🏦 Transferencia</span>
                                         {% else %}
                                             <span class="badge badge-secondary report-badge">{{ order.paymentMethod }}</span>
                                         {% endif %}
@@ -162,8 +162,8 @@
                         </table>
                     {% else %}
                         <div class="text-center py-4">
-                            <p class="text-muted report-text">📋 dont have any orders for this date.</p>
-                            <small class="report-text"> select other time or check that there are registered sales.</small>
+                            <p class="text-muted report-text">📋 No hay pedidos registrados para esta fecha.</p>
+                            <small class="report-text">Selecciona otra fecha o verifica que existan ventas registradas.</small>
                         </div>
                     {% endif %}
                 </div>
@@ -175,10 +175,10 @@
     <div class="row mt-4">
         <div class="col-12 text-center">
             <a href="{% url 'orders' %}" class="btn btn-outline-primary mr-2">
-                ← Back to Sales
+                ← Volver a ventas
             </a>
             <button onclick="window.print()" class="btn btn-outline-secondary">
-                🖨️ Print Report
+                🖨️ Imprimir reporte
             </button>
         </div>
     </div>
@@ -187,11 +187,11 @@
 <!-- Estilos específicos para el reporte diario -->
 <style>
 /* 
- * Daily Report Styles - Force black text for readability
- * These styles override Bootstrap's default text-white classes
+ * Estilos del reporte diario - Forzar texto negro para mejor legibilidad
+ * Estos estilos sobrescriben las clases text-white de Bootstrap
  */
 
-/* Apply black color to all text within the report container */
+/* Aplicar color negro a todo el texto dentro del contenedor del reporte */
 .daily-report-container .report-text,
 .daily-report-container .report-text *,
 .daily-report-container .report-card .card-title,
@@ -205,7 +205,7 @@
     color: #000 !important;
 }
 
-/* Ensure all table elements have black text */
+/* Asegurar que todos los elementos de la tabla tengan texto negro */
 .daily-report-container table,
 .daily-report-container table *,
 .daily-report-container .table,
@@ -214,7 +214,7 @@
     color: #000 !important;
 }
 
-/* Override Bootstrap badge colors */
+/* Sobrescribir colores de las insignias (badges) */
 .daily-report-container .badge,
 .daily-report-container .report-badge {
     color: #000 !important;
@@ -222,13 +222,13 @@
     border: 1px solid #dee2e6 !important;
 }
 
-/* Ensure card headers have black text */
+/* Asegurar que los encabezados de las tarjetas tengan texto negro */
 .daily-report-container .card-header h5,
 .daily-report-container .card-header .report-text {
     color: #000 !important;
 }
 
-/* Override text-white class specifically in report cards */
+/* Sobrescribir clases text-white en las tarjetas del reporte */
 .daily-report-container .card.bg-primary .report-text,
 .daily-report-container .card.bg-success .report-text,
 .daily-report-container .card.bg-info .report-text,
@@ -237,15 +237,15 @@
     color: #000 !important;
 }
 
-/* Ensure text-muted is also black in reports */
+/* Asegurar que text-muted también sea negro en los reportes */
 .daily-report-container .text-muted,
 .daily-report-container .text-muted.report-text {
     color: #000 !important;
 }
 
-/* Print styles */
+/* Estilos para impresión */
 @media print {
-    /* Hide buttons and forms when printing */
+    /* Ocultar botones y formularios al imprimir */
     .btn, 
     .form-group, 
     .form-inline,
@@ -253,17 +253,17 @@
         display: none !important;
     }
     
-    /* Full width for print */
+    /* Ancho completo al imprimir */
     .container {
         max-width: 100% !important;
     }
     
-    /* Ensure all text is black when printing */
+    /* Todo el texto en negro al imprimir */
     * {
         color: #000 !important;
     }
     
-    /* Remove background colors for better printing */
+    /* Quitar colores de fondo para mejor impresión */
     .card {
         border: 1px solid #000 !important;
     }

@@ -1,17 +1,16 @@
-
 {% extends 'admin/base_admin.html' %}
 
 {% block content %}
 <div class="container mt-5">
     <h1 class="mb-4 text-center">Gestión de materia prima</h1>
 
-    <!-- Low Stock Alert Banner -->
+    <!-- Alerta de bajo stock -->
     {% if low_stock_count > 0 %}
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        <strong>⚠️ Stock Alerts!</strong> 
-        You have <strong>{{ low_stock_count }}</strong> product(s) with low stock.
-        <a href="{% url 'low_stock_alerts' %}" class="alert-link">View Details →</a>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <strong>⚠️ ¡Alerta de inventario!</strong> 
+        Tienes <strong>{{ low_stock_count }}</strong> producto(s) con poco inventario.
+        <a href="{% url 'low_stock_alerts' %}" class="alert-link">Ver detalles →</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
     </div>
     {% endif %}
 
@@ -20,14 +19,14 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-danger">
           <div class="modal-header bg-danger text-white">
-            <h5 class="modal-title" id="alertModalLabel">🚨 Alerta!</h5>
+            <h5 class="modal-title" id="alertModalLabel">🚨 ¡Alerta!</h5>
           </div>
           <div class="modal-body text-center">
-            <p><strong>Alguna materia prima esta pronta a vencer.</strong></p>
+            <p><strong>Alguna materia prima está próxima a vencer.</strong></p>
           </div>
           <div class="modal-footer justify-content-center">
             <a href="{% url 'expiring_materials' %}" class="btn btn-danger">Revisar</a>
-            <a href="{% url 'generate_shopping_list' %}" class="btn btn-danger">Generar lista compras</a>
+            <a href="{% url 'generate_shopping_list' %}" class="btn btn-danger">Generar lista de compras</a>
             <a href="{% url 'inventory' %}?dismissed=1" class="btn btn-secondary">Cerrar</a>
           </div>
         </div>
@@ -39,11 +38,11 @@
         <div class="col-md-12">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                    Materias Primas
-                    <a href="{% url 'create_raw_material' %}" class="btn btn-light btn-sm">+ Añadir materia prima</a>
-                    <a href="{% url 'inventory_history' %}" class="btn btn-light btn-sm">+ Historial de inventario</a>
-
-
+                    <span>Materias Primas</span>
+                    <div>
+                        <a href="{% url 'create_raw_material' %}" class="btn btn-light btn-sm">+ Añadir materia prima</a>
+                        <a href="{% url 'inventory_history' %}" class="btn btn-light btn-sm">📜 Historial de inventario</a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
@@ -67,23 +66,18 @@
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4" class="text-center">No hay materia prima registrada</td>
+                                <td colspan="4" class="text-center">No hay materia prima registrada.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
-
                     </table>
-                       
- 
-                    
-                    <!-- Include pagination component -->
+
+                    <!-- Paginación -->
                     {% include 'partials/pagination.html' %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
 
 {% endblock %}

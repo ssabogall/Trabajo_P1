@@ -4,14 +4,14 @@
 
 {% block content %}
 
-<!-- Alert container -->
+<!-- Contenedor de alertas -->
 <div id="alert-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
 
 <div class="container px-4 px-lg-5 mt-5">
     <div class="row">
-        <!-- Products Column -->
+        <!-- Columna de productos -->
         <div class="col-md-8">
-            <h3 class="mb-4">Products</h3>
+            <h3 class="mb-4">Productos</h3>
             {% if products %}
                 <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-3 justify-content-center">
                     {% for product in products %}
@@ -21,7 +21,19 @@
                                 <div class="card-body p-4">
                                     <div class="text-center">
                                         <h5 class="fw-bolder">{{ product.name }}</h5>
-                                        {% if product|has_promo %}<span class="text-muted text-decoration-line-through">${{ product.price }}</span> <span class="fw-bold">${{ product|effective_price }}</span><div><span class="badge bg-warning text-dark mt-2">Promo</span></div>{% else %}${{ product.price }}{% endif %}
+                                        {% if product|has_promo %}
+                                            <span class="text-muted text-decoration-line-through">
+                                                ${{ product.price }}
+                                            </span> 
+                                            <span class="fw-bold">
+                                                ${{ product|effective_price }}
+                                            </span>
+                                            <div>
+                                                <span class="badge bg-warning text-dark mt-2">Promoción</span>
+                                            </div>
+                                        {% else %}
+                                            ${{ product.price }}
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
@@ -32,7 +44,7 @@
                                             data-price="{{ product|effective_price }}"
                                             data-id="{{ product.id }}"
                                         >
-                                            <i class="fas fa-plus-circle me-1"></i>Add
+                                            <i class="fas fa-plus-circle me-1"></i>Añadir
                                         </button>
                                     </div>
                                 </div>
@@ -40,28 +52,29 @@
                         </div>
                     {% endfor %}
                 </div>
-                
 
-                <!-- Include pagination component -->
+                <!-- Incluir componente de paginación -->
                 {% include 'partials/pagination.html' %}
             {% else %}
                 <div class="alert alert-info">
-                    <i class="fas fa-info-circle me-2"></i>No products available at the moment.
+                    <i class="fas fa-info-circle me-2"></i>No hay productos disponibles en este momento.
                 </div>
             {% endif %}
         </div>
 
-        <!-- Order List Column -->
+        <!-- Columna de lista de pedido -->
         <div class="col-md-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-dark text-white">
-                    <h4 class="mb-0"><i class="fas fa-receipt me-2"></i>Order List</h4>
+                    <h4 class="mb-0">
+                        <i class="fas fa-receipt me-2"></i>Lista de Pedido
+                    </h4>
                 </div>
                 <div class="card-body">
                     <ul class="list-group mb-3" id="order-list">
-                        <!-- Order items will appear here -->
+                        <!-- Los productos del pedido aparecerán aquí -->
                         <li class="list-group-item text-center text-muted">
-                            <i class="fas fa-shopping-cart me-2"></i>No items in order
+                            <i class="fas fa-shopping-cart me-2"></i>No hay productos en el pedido
                         </li>
                     </ul>
                     
@@ -72,42 +85,44 @@
                         <h5 class="mb-0 text-success">$<span id="order-total">0.00</span></h5>
                     </div>
 
-                    <!-- Payment Method Toggle -->
+                    <!-- Método de pago -->
                     <div class="mb-3">
                         <label for="payment-toggle" class="form-label fw-bold">
-                            <i class="fas fa-credit-card me-2"></i>Payment Method:
+                            <i class="fas fa-credit-card me-2"></i>Método de pago:
                         </label>
                         <button id="payment-toggle" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-money-bill-wave me-2"></i>Cash
+                            <i class="fas fa-money-bill-wave me-2"></i>Efectivo
                         </button>
                     </div>
 
-                    <!-- Customer Information -->
+                    <!-- Información del cliente -->
                     <hr>
-                    <h6 class="mb-3"><i class="fas fa-user me-2"></i>Customer Information (Optional)</h6>
+                    <h6 class="mb-3">
+                        <i class="fas fa-user me-2"></i>Información del cliente (opcional)
+                    </h6>
                     
                     <div class="mb-2">
-                        <label for="cedula" class="form-label">ID</label>
-                        <input type="text" id="cedula" class="form-control" placeholder="Customer ID">
+                        <label for="cedula" class="form-label">Cédula</label>
+                        <input type="text" id="cedula" class="form-control" placeholder="Cédula del cliente">
                     </div>
                     <div class="mb-2">
-                        <label for="nombre" class="form-label">Name</label>
-                        <input type="text" id="nombre" class="form-control" placeholder="Customer Name">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" id="nombre" class="form-control" placeholder="Nombre del cliente">
                     </div>
                     <div class="mb-3">
-                        <label for="correo" class="form-label">Email</label>
-                        <input type="email" id="correo" class="form-control" placeholder="customer@email.com">
+                        <label for="correo" class="form-label">Correo electrónico</label>
+                        <input type="email" id="correo" class="form-control" placeholder="cliente@correo.com">
                     </div>
 
                     <button class="btn btn-success mt-3 w-100" id="checkout-btn" disabled>
-                        <i class="fas fa-check-circle me-2"></i>Checkout
+                        <i class="fas fa-check-circle me-2"></i>Finalizar compra
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+{% endblock %}
 
 {% block extra_scripts %}
 <script src="{% static 'products/js/scriptPOS.js' %}"></script>
