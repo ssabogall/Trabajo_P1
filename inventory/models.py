@@ -17,7 +17,9 @@ class Product(models.Model):
     description = models.TextField(blank=True,null=True)
     price = models.DecimalField(max_digits=7, decimal_places=0)
     quantity = models.PositiveIntegerField(default=0)
-    picture = models.ImageField(upload_to='')
+    picture = models.ImageField( upload_to='')
+    reorder_threshold = models.PositiveIntegerField(default=10, help_text="Umbral de reorden (cantidad mínima antes de alertar)")
+
     raw_materials = models.ManyToManyField(
         'RawMaterial',
         related_name='products',
@@ -26,6 +28,16 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def is_low_stock(self):
+        """Retorna True si el producto está por debajo del umbral de reorden"""
+        return self.quantity < self.reorder_threshold
+    
+    def stock_percentage(self):
+        """Retorna el porcentaje de stock actual respecto al umbral"""
+        if self.reorder_threshold == 0:
+            return 100
+        return (self.quantity / self.reorder_threshold) * 100
 
 
 class ProductRawMaterial(models.Model):

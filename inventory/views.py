@@ -5,14 +5,22 @@ from django.utils import timezone
 from django.utils.timezone import now, timedelta
 from .utils.pagination_helper import PaginationHelper
 from .models import MovimientosInventario
+from django.db import models
 
 def inventory(request):
+    from inventory.models import Product
+    
     today = now().date()
     soon = today + timedelta(days=5)
     expiring_soon = RawMaterial.objects.filter(exp_date__lte=soon, exp_date__gte=today)
 
     dismissed = request.GET.get("dismissed") == "1"
     show_modal = bool(expiring_soon) and not dismissed
+
+    # Check for low stock products
+    low_stock_count = Product.objects.filter(
+        quantity__lt=models.F('reorder_threshold')
+    ).count()
 
     # Apply pagination
     queryset = RawMaterial.objects.all()
@@ -26,6 +34,7 @@ def inventory(request):
     context = {
         "materias_primas": pagination.get_items(),
         "show_modal": show_modal,
+        "low_stock_count": low_stock_count,
         **pagination.get_context()  # Add pagination context
     }
 
@@ -158,3 +167,28 @@ def registrar_salida(material, cantidad):
 def inventory_history(request):
     movimientos = MovimientosInventario.objects.all().order_by('-date')
     return render(request, 'inventory/inventory_history.html', {'movements': movimientos})
+@login_required
+def low_stock_alerts(request):
+    """
+    Vista para mostrar productos con stock bajo.
+    Muestra productos donde quantity < reorder_threshold
+    """
+    from inventory.models import Product
+    
+    # Obtener productos con stock bajo
+    low_stock_products = Product.objects.filter(
+        quantity__lt=models.F('reorder_threshold')
+    ).order_by('quantity')
+    
+    # Contar alertas críticas (menos del 50% del umbral)
+    critical_count = low_stock_products.filter(
+        quantity__lt=models.F('reorder_threshold') / 2
+    ).count()
+    
+    context = {
+        'low_stock_products': low_stock_products,
+        'total_alerts': low_stock_products.count(),
+        'critical_count': critical_count,
+    }
+    
+    return render(request, 'inventory/low_stock_alerts.html', context)

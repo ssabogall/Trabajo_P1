@@ -8,5 +8,5 @@ urlpatterns = [
     path('create/', views.create_raw_material, name='create_raw_material'),
     path('history/', views.inventory_history, name='inventory_history'),
     path('generate_shopping_list_pdf/', views.generate_shopping_list, name='generate_shopping_list'),
-
+    path('low-stock/', views.low_stock_alerts, name='low_stock_alerts'),
 ]

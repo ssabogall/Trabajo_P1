@@ -5,6 +5,16 @@
 <div class="container mt-5">
     <h1 class="mb-4 text-center">Gestión de materia prima</h1>
 
+    <!-- Low Stock Alert Banner -->
+    {% if low_stock_count > 0 %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>⚠️ Stock Alerts!</strong> 
+        You have <strong>{{ low_stock_count }}</strong> product(s) with low stock.
+        <a href="{% url 'low_stock_alerts' %}" class="alert-link">View Details →</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
     {% if show_modal %}
     <div class="modal fade show" id="alertModal" tabindex="-1" aria-labelledby="alertModalLabel" aria-hidden="true" style="display:block; background: rgba(0,0,0,0.5);">
       <div class="modal-dialog modal-dialog-centered">
@@ -77,4 +87,3 @@
 
 
 {% endblock %}
-
