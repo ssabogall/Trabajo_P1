@@ -2,14 +2,14 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Raw Materials Expiring Soon</h2>
+    <h2>Materia prima que vende pronto</h2>
 
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Units</th>
-                <th>Expiration Date</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Fecha de vencimiento</th>
             </tr>
         </thead>
         <tbody>
@@ -21,12 +21,12 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="3" class="text-center">No materials expiring soon</td>
+                <td colspan="3" class="text-center">No hay materia prima que vence pronto</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 
-    <a href="{% url 'inventory' %}" class="btn btn-secondary">Back to Inventory</a>
+    <a href="{% url 'inventory' %}" class="btn btn-secondary">Volver a inventario</a>
 </div>
 {% endblock %}

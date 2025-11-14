@@ -2,23 +2,23 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Edit Raw Material</h2>
+    <h2>Editar materia prima</h2>
     <form method="post">
         {% csrf_token %}
         <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
+            <label for="name" class="form-label">Nombre</label>
             <input type="text" class="form-control" name="name" value="{{ materia.name }}">
         </div>
         <div class="mb-3">
-            <label for="units" class="form-label">Units</label>
+            <label for="units" class="form-label">Cantidad</label>
             <input type="text" class="form-control" name="units" value="{{ materia.units }}">
         </div>
         <div class="mb-3">
-            <label for="exp_date" class="form-label">Expiration Date</label>
+            <label for="exp_date" class="form-label">Fecha de vencimiento</label>
             <input type="date" class="form-control" name="exp_date" value="{{ materia.exp_date|date:'Y-m-d' }}">
         </div>
-        <button type="submit" class="btn btn-success">Save</button>
-        <a href="{% url 'inventory' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <a href="{% url 'inventory' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 {% endblock %}

@@ -7,8 +7,8 @@
         <div class="col-md-8 col-lg-6">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white text-center">
-                    <h3 class="mb-0">Create Account</h3>
-                    <p class="mb-0 small">Join Banetón today</p>
+                    <h3 class="mb-0">Crear cuenta</h3>
+                    <p class="mb-0 small">Unete a Baneton hoy</p>
                 </div>
                 <div class="card-body p-4">
                     {% if messages %}
@@ -23,7 +23,7 @@
                     <form method="post" novalidate>
                         {% csrf_token %}
                         
-                        <h5 class="mb-3 text-primary">Account Information</h5>
+                        <h5 class="mb-3 text-primary">Información de cuenta</h5>
                         
                         <!-- Username -->
                         <div class="mb-3">
@@ -37,7 +37,7 @@
                                 </div>
                             {% endif %}
                             <small class="form-text text-muted">
-                                Choose a unique username for login.
+                                Elija un nombre de usuario único para iniciar sesión.
                             </small>
                         </div>
 
@@ -69,7 +69,7 @@
 
                         <hr class="my-4">
 
-                        <h5 class="mb-3 text-primary">Personal Information</h5>
+                        <h5 class="mb-3 text-primary">Información personal</h5>
 
                         <!-- ID Number -->
                         <div class="mb-3">
